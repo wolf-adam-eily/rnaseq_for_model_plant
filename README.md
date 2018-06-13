@@ -1109,14 +1109,15 @@ For this next step it is assumed that you are familiar with plotting in R. If no
 <pre style="color: silver; background: black;">
 plot.new()
 par(mfrow=c(1,1))
-plot(pca[,1],pca[,2], xlab="", ylab="", main="PCA plot for all libraries")
-points(pca[,1], pca[,2], col="grey", cex=2, pch=16)
-text(pca[,1], pca[,1], short_names, col=c("red", "red", "hotpink", "hotpink"))</pre>
+##point colors
+point_colors = c("red", "red", "blue", "blue")
+plot(pca[,1],pca[,2], xlab="", ylab="", main="PCA plot for all libraries", xlim=c(-0.2,0.2), ylim=c(-0.2,0.2),col=point_colors)
+text(pca[,1],pca[,2],pos=2,short_names, col=c("red", "red", "blue", "blue"))</pre>
 
 
 <h2 id="Seventh_Point_Header">Topological networking using cytoscape</h2>
 
-<a href="https://github.com/miriamposner/cytoscape_tutorials">Cytoscape</a> is a desktop program which creates visual topological networks of data. The only requirement to create a topological network in Cytospace is to have an "edge list". An edge list is a two-column list which comprises two separate types of data. Each row of the edge list is a single piece of information (so both columns combine to form a piece of infromation for the row) that Cytospace uses. Now, let's go over the two columns of an edge list:
+<a href="https://github.com/miriamposner/cytoscape_tutorials">Cytoscape</a> is a desktop program which creates visual topological networks of data. The only requirement to create a topological network in Cytospace is to have an "edge list". An edge list is a two-column list which comprises two separate types of data. Each row of the edge list is a single piece of information (so both columns combine to form a piece of infromation for the row) that Cytospace uses. To begin, download and install Cytospace. Now, let's go over the two columns of an edge list:
 
 The two columns of an edge list represent the "sources" and "nodes". You may instead think of the two columns representing an object and its group. For instance, the edge list:
 
@@ -1127,4 +1128,128 @@ The two columns of an edge list represent the "sources" and "nodes". You may ins
 	D	3
 	A	4
 	C	3</pre>
-Means that object A is in both groups 1 and 4, object B is in only group 1, object C is in groups 3 and 4, and so forth. We could then say that our sources are the objects, and our nodes are the groups to which each object belongs. To make our topological network we simply put one point for each object and one point for each group on a piece of paper and draw arrows going from each object-point to each group-point. If two objects are pointing to the same group, we place those objects closer to the group. If an object is part of two or more groups, that object will have two or more arrows pointing to each distinct group to which it belong. The cardinal rule is that no object may have two arrows pointing to the same group (that is, the set for that group is pairwise disjoint). Now we need to begin thinking about our differential expression data.
+means that object A is in both groups 1 and 4, object B is in only group 1, object C is in groups 3 and 4, and so forth. We could then say that our sources are the objects, and our nodes are the groups to which each object belongs. To make our topological network we simply put one point for each object and one point for each group on a piece of paper and draw arrows going from each object-point to each group-point. If two objects are pointing to the same group, we place those objects closer to the group. If an object is part of two or more groups, that object will have two or more arrows pointing to each distinct group to which it belong. The cardinal rule is that no object may have two arrows pointing to the same group (that is, the set for that group is pairwise disjoint). Now we need to begin thinking about our differential expression data. We could group the genes with the phenotype which expresses them most. . .but that would leave all of our genes (sources) flowing to only four sinks (nodes). That certainly does not communicate much. However, we have our differential gene expression results written into a csv, complete with the fold-change, or how the percentage increase between phenotypes. We could group our genes according to their fold-changes. However, should we do this, each of our sources would flow only to one sink, and we'd have no information about the flow between sinks. What we <i>can</i> do, however, is to perform a variety of grouping exercises, successively grouping our results into larger and larger groups. The initial grouping will be the most specific, composed of the most sinks. However, the second grouping will be less specific, consisting of fewer sinks but the same number of sources. Therefore, some of the sinks in the initial grouping have converged. We can now determine which sinks have converged and conncet those sinks in the first grouping. We can repeat this until it is of no more use to us. 
+
+To achieve this, we can create a series of family trees, or <a href="https://en.wikipedia.org/wiki/Dendrogram>dendorgrams</a>. You have most likely encountered many dendrograms before in an evolutionary biology course. An important note about dendrograms is that only the <b>height</b> of the tree matters. It does not matter, laterally, how close together any two leaves are. Leaves and nodes which are separated by a small height are more closely related than leaves and nodes which are separated by greater heights, regardless of the lateral distance needed to reach one or the other. This will come in handy. We can create a dendrogram of our genes based on their fold changes and then create our groups by taking at first each node and its closer neighbor. Afterwards, we can create a second dendogram of our genes based on their changes and create our groups by taking each node and its two closest neighbors. The second tree will be less specific, and each group will be a combination of two groups frmo the first tree. We continue this process until it is of no use, and then create our edge-list as needed. To do this, we will be back in R, this time using the package "RFLPtools", which allows us to write our groups into a plain-text document. Let's load R and our gene results:
+	
+<pre style="color: silver; background: black;">
+##re-set working directory if you have exited R, and re-load libraries
+diffexp_genes = read.csv("gene_results.csv",header=T)
+diffexp_genes = as.data.frame(diffexp_genes)
+gene_ids = diffexp_genes[,2]
+head(diffexp_genes)
+
+  <strong>feature         id           fc         pval      qval
+1    gene MSTRG.4142 2.075827e-01 0.0000491845 0.5184498
+2    gene  AT4G14220 2.103846e+01 0.0001882308 0.5184498
+3    gene MSTRG.3788 5.031936e-03 0.0002087393 0.5184498
+4    gene MSTRG.5824 2.867578e-03 0.0002187155 0.5184498
+5    gene  MSTRG.568 3.186395e-01 0.0002764999 0.5184498
+6    gene  MSTRG.811 3.236509e-04 0.0003448702 0.5184498</strong>
+</pre>
+
+We care only about the gene IDs and their fold-changes.
+
+<pre style="color: silver; background: black;">
+diffexp_genes = diffexp_genes[,3]
+diffexp_genes = as.data.frame(diffexp_genes)
+rownames(diffexp_genes) = gene_ids
+colnames(diffexp_genes) = "fc"
+head(diffexp_genes)
+<strong>
+MSTRG.4142 2.075827e-01
+AT4G14220  2.103846e+01
+MSTRG.3788 5.031936e-03
+MSTRG.5824 2.867578e-03
+MSTRG.568  3.186395e-01
+MSTRG.811  3.236509e-04</strong>
+</pre>
+
+Now we need to calculate the distances of each gene from one another based on fold change. This is easy, we simply start make an nrow x nrow matrix where each cell in the matrix is the absolute value of its row and column genes' fold-changes subtracted from one another. R has a very friendly package "dist()" which does this for us. dist only requires the raw matrix, and will do the rest of the work. Let's try it out:
+
+<pre style="color: silver; background: black;">
+dist_diffexp_genes = dist(diffexp_genes)
+
+head(dist_diffexp_genes)
+<strong>[1]  20.83087999   0.20255079   0.20471515   0.11105679   0.20725907   0.16655252  19.67123966  17.15730053</strong></pre>
+
+Do not worry that there are no names in this output! dist() has kept track of the names and you may trust this output. Now we may move on to creating our groups for the tree based on the distances. We will be using hclust(), which is a <a href="https://en.wikipedia.org/wiki/Hierarchical_clustering>hierarchical clustering</a> command. We won't go into the math involved, as your brain is probably quite tired already. However, hclust requires only one argument, the output of the dist() function. Let's try it:
+	
+<pre style="color: silver; background: black;">clusters = hclust(dist_diffexp_genes)</pre>
+
+The output of head(clusters) is much to large to include here. However, we can plot our dendrogram quite easily:
+
+<pre style="color: silver; background: black;">plot(clusters)</pre>
+If you squint you can estimate how many groups is suitable with which to start. I count 12. We can group our dendogram into its twelve most clostly related parts using the function rect.hclust(). 
+
+rect.hclust() requires two arguments, the dendogram object and the number of groups:
+
+<pre style="color: silver; background: black;">clusters_12 = clusters
+plot(clusters_12, main="Fold change dendrogram in 12 parts")
+rect.hclust(clusters_12, k = 12)</pre>
+
+Each gene now belongs to one cluster 1-12. Using RFLPtools' function write.hclust().
+
+write.hclust() takes the dendrogram object, the number of groups desired, the output file name, and a prefix string which simply describes the data. Because write and rect are both functions of hclust, the output will be the same as long as the number of groups is the same. Let's write our clusters of 12 group:
+
+<pre style="color: silver; background: black;">write.hclust(clusters_12, k = 12, file="clusters_of_12.txt",prefix="genes")
+head("clusters_of_12.txt")
+clusters_of_12_csv = read.table("clusters_of_12.txt", sep="\t", header=T)
+##we know that the file is tab delimited
+head(clusters_of_12_csv)
+<strong>Sample Cluster Cluster.ID
+1 MSTRG.4142       1 genes_H_01
+2  AT4G14220       1 genes_H_01
+3 MSTRG.3788       1 genes_H_01
+4 MSTRG.5824       1 genes_H_01
+5  MSTRG.568       1 genes_H_01
+6  MSTRG.811       1 genes_H_01</strong>
+##we only need columns 1 and 2
+clusters_of_12_csv = clusters_of_12_csv[,1:2]
+head(clusters_of_12_csv)
+<strong>  Sample Cluster
+1 MSTRG.4142       1
+2  AT4G14220       1
+3 MSTRG.3788       1
+4 MSTRG.5824       1
+5  MSTRG.568       1
+6  MSTRG.811       1</strong>
+##now let's write our csv
+write.csv(clusters_of_12_csv, file = "clusters_of_12.csv", row.names=F)
+</pre>
+
+If you briefly open the clusters_of_!2.csv file on your desktop you'll see we have a perfect edge list! Now let's repeat twice more, but with groups of 6 (each group merged with its closest neighbor) and 3 (each group merged with its 3 closest neighbors):
+
+<pre style="color: silver; background: black;">
+write.hclust(clusters, k = 6, file = "clusters_of_6.txt", prefix="genes")
+clusters_of_6_csv = read.table("clusters_of_6.txt", sep="\t", header=T)
+clusters_of_6_csv = clusters_of_6_csv[,1:2]
+write.csv(clusters_of_6_csv, file="clusters_of_6.csv", row.names=F)
+write.hclust(clusters, k = 3, file = "clusters_of_3.txt", prefix="genes")
+clusters_of_3_csv = read.table("clusters_of_3.txt", sep="\t", header=T)
+clusters_of_3_csv = clusters_of_3_csv[,1:2]
+write.csv(clusters_of_3_csv, file="clusters_of_3.csv", row.names=F)</pre>
+
+Now that we have our clusters, we are going to need to combine all of them into one edge list. This seems easy, but keep in mind that if we copy and paste them as is we have three group 1s, 2s, and 3s, which each are actually a different group! Let's start with the clusters of 3. We know that in our largest we have groups 1-12. So for each group in clusters of 3 we must transform them such that they are not any number 1 - 12. The easiest way to do this is to multiply each by 13, which will give us 13, 26, 39 as our new groups. Those are not present in any other clustering, so we maintain that they are all unique groups across files. In Excel simply multiply the entire column by 13 in the clusters of 3 file. Now we repeat for the clusters of 6, multiplying each group instead by 14. Our groups are now 1-12, 13, 26, 39, 14, 28, 42, 56, 70, 80. No overlap! Lastly we simply copy clusters of 6 and paste it beneath clusters of 3, followed by copying clusters of 12 and pasting those beneath the other two. Lastly, save your file and you are ready to use Cytoscape!
+
+First, load Cytospace and you will be greeted with a screen like this:
+
+Click this icon:
+
+
+and load your data. Your screen should now look like:
+
+
+Cytospace does not know which are the sources and which are the nodes. We know that our genes are our sources flowing into our nodes. Therefore, we click on sample and the following window should appear:
+
+Click on "Source node".
+
+Now click on "Cluster" and then "Target node".
+
+Lastly, hit OK to import your data. 
+
+Currently our data is not in a very presentable format. Let's go over to the Style button and click the box which says "default". Click on "curved". Then click on Layout and choose "circular layout". The end result should be this:
+
+You can play around without as you like, my final result looked like this:
+
+We see we have one large central network which connects to two small networks. Lastly, we have a peripheral network which seems to be distinct. If we zoom in, we see that our largest network is group 
