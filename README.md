@@ -1061,7 +1061,7 @@ help(cmdscale)</pre>
 
 <pre style="color: silver; background: black;"><strong>Classical (Metric) Multidimensional Scaling</strong>
 
-<strong style="color: grey;">e="Description</strong>
+<strong style="color: grey;">Description</strong>
 
 <em style="color: green;">Classical multidimensional scaling (MDS) of a data matrix. Also known as principal coordinates analysis (Gower, 1966).</em>
 
