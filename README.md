@@ -859,35 +859,34 @@ bg <- ballgown(dataDir = "ballgown", pData=pheno_matrix, samplePattern = "athali
 
 &#35;&#35;we filter our ballgown object to take only genes with <a href="https://en.wikipedia.org/wiki/Variance">variances</a> above 1 using <a href="https://www.rdocumentation.org/packages/metaMA/versions/3.1.2/topics/rowVars">rowVars()</a>
 
-??ballgown::subset</pre>
+??ballgown::subset
 
-<br>
+<strong style="color: blue;">subset ballgown objects to specific samples or genomic locations</strong>
 
-<div class="boxed">subset ballgown objects to specific samples or genomic locations
+<strong style="color: grey;">"Description</strong>
 
-Description
+<em style="color: green;">subset ballgown objects to specific samples or genomic locations</em>
 
-subset ballgown objects to specific samples or genomic locations
-
-Usage
+<strong style="color: grey;">Usage</strong>
 
 subset(x, ...)
 
 ## S4 method for signature 'ballgown'
 subset(x, cond, genomesubset = TRUE)
-Arguments
+
+<strong style="color: grey;">Arguments</strong>
 
 x	
-a ballgown object
-...	
-further arguments to generic subset
-cond	
-Condition on which to subset. See details.
-genomesubset	
-if TRUE, subset x to a specific part of the genome. Otherwise, subset x to only include specific samples. TRUE by default.
-Details
+a 		ballgown object
+...		further arguments to generic subset
+cond		Condition on which to subset. See details.
+genomesubset	if TRUE, subset x to a specific part of the genome. Otherwise, subset x to only include specific samples. TRUE by 			default.
 
-To use subset, you must provide the cond argument as a string representing a logical expression specifying your desired subset. The subset expression can either involve column names of texpr(x, "all") (if genomesubset is TRUE) or of pData(x) (if genomesubset is FALSE). For example, if you wanted a ballgown object for only chromosome 22, you might call subset(x, "chr == 'chr22'"). (Be sure to handle quotes within character strings appropriately).</div>
+<strong style="color: grey;">Details</strong>
+
+To use subset, you must provide the cond argument as a string representing a logical expression specifying your desired subset. The subset expression can either involve column names of texpr(x, "all") (if genomesubset is TRUE) or of pData(x) (if genomesubset is FALSE). For example, if you wanted a ballgown object for only chromosome 22, you might call subset(x, "chr == 'chr22'"). (Be sure to handle quotes within character strings appropriately).</pre>
+
+<br>
 
 <pre style="color: silver; background: black;">bg_filt = subset(bg, "rowVars(texpr(bg))>1", genomesubset=TRUE)
 
@@ -896,50 +895,37 @@ To use subset, you must provide the cond argument as a string representing a log
 To perform the isoform differential expression analysis we use ballgown's "stattest" function. Let's have a look at it:
 <pre style="color: silver; background: black;">??ballgown::stattest</pre>
 
-<div class="boxed">
-  statistical tests for differential expression in ballgown
+<strong style="color: blue;">statistical tests for differential expression in ballgown</strong>
 
-Description
+<strong style="color: grey;">Description</strong>
 
-Test each transcript, gene, exon, or intron in a ballgown object for differential expression, using comparisons of linear models.
+<em style="color: green;">Test each transcript, gene, exon, or intron in a ballgown object for differential expression, using comparisons of linear models.</em>
 
-Usage
+<strong style="color: grey;">Usage</strong>
 
 stattest(gown = NULL, gowntable = NULL, pData = NULL, mod = NULL,
   mod0 = NULL, feature = c("gene", "exon", "intron", "transcript"),
   meas = c("cov", "FPKM", "rcount", "ucount", "mrcount", "mcov"),
   timecourse = FALSE, covariate = NULL, adjustvars = NULL, gexpr = NULL,
   df = 4, getFC = FALSE, libadjust = NULL, log = TRUE)
-Arguments
 
-gown	
-name of an object of class ballgown
-gowntable	
-matrix or matrix-like object with rownames representing feature IDs and columns representing samples, with expression estimates in the cells. Provide the feature name with feature. You must provide exactly one of gown or gowntable. NB: gowntable is log-transformed within stattest if log is TRUE, so provide un-logged expression values in gowntable.
-pData	
-Required if gowntable is provided: data frame giving phenotype data for the samples in the columns of gowntable. (Rows of pData correspond to columns of gowntable). If gown is used instead, it must have a non-null, valid pData slot (and the pData argument to stattest should be left NULL).
-mod	
-object of class model.matrix representing the design matrix for the linear regression model including covariates of interest
-mod0	
-object of class model.matrix representing the design matrix for the linear regression model without the covariates of interest.
-feature	
-the type of genomic feature to be tested for differential expression. If gown is used, must be one of "gene", "transcript", "exon", or "intron". If gowntable is used, this is just used for labeling and can be whatever the rows of gowntable represent.
-meas	
-the expression measurement to use for statistical tests. Must be one of "cov", "FPKM", "rcount", "ucount", "mrcount", or "mcov". Not all expression measurements are available for all features. Leave as default if gowntable is provided.
-timecourse	
-if TRUE, tests whether or not the expression profiles of genomic features vary over time (or another continuous covariate) in the study. Default FALSE. Natural splines are used to fit time profiles, so you must have more timepoints than degrees of freedom used to fit the splines. The default df is 4.
-covariate	
-string representing the name of the covariate of interest for the differential expression tests. Must correspond to the name of a column of pData(gown). If timecourse=TRUE, this should be the study's time variable.
-adjustvars	
-optional vector of strings representing the names of potential confounders. Must correspond to names of columns of pData(gown).
-gexpr	
-optional data frame that is the result of calling gexpr(gown)). (You can speed this function up by pre-creating gexpr(gown).)
-df	
-degrees of freedom used for modeling expression over time with natural cubic splines. Default 4. Only used if timecourse=TRUE.
-getFC	
-if TRUE, also return estimated fold changes (adjusted for library size and confounders) between populations. Only available for 2-group comparisons at the moment. Default FALSE.
-libadjust	
-library-size adjustment to use in linear models. By default, the adjustment is defined as the sum of the sample's log expression measurements below the 75th percentile of those measurements. To use a different library-size adjustment, provide a numeric vector of each sample's adjustment value. Entries of this vector correspond to samples in in rows of pData. If no library size adjustment is desired, set to FALSE.
-log	
-if TRUE, outcome variable in linear models is log(expression+1), otherwise it's expression. Default TRUE.
-</div>
+<strong style="color: grey;">Arguments</strong>
+
+gown		name of an object of class ballgown
+gowntable	matrix or matrix-like object with rownames representing feature IDs and columns representing samples, with expression 
+		estimates in the cells. Provide the feature name with feature. You must provide exactly one of gown or gowntable. NB: 			gowntable is log-transformed within stattest if log is TRUE, so provide un-logged expression values in gowntable.
+pData		Required if gowntable is provided: data frame giving phenotype data for the samples in the columns of gowntable. (Rows 			of pData correspond to columns of gowntable). If gown is used instead, it must have a non-null, valid pData slot (and 			the pData argument to stattest should be left NULL).
+mod		object of class model.matrix representing the design matrix for the linear regression model including covariates of 			interest
+mod0		object of class model.matrix representing the design matrix for the linear regression model without the covariates of 			interest.
+feature		the type of genomic feature to be tested for differential expression. If gown is used, must be one of "gene", 				"transcript", "exon", or "intron". If gowntable is used, this is just used for labeling and can be whatever the rows of 		gowntable represent.
+meas		the expression measurement to use for statistical tests. Must be one of "cov", "FPKM", "rcount", "ucount", "mrcount", or 		"mcov". Not all expression measurements are available for all features. Leave as default if gowntable is provided.
+timecourse	if TRUE, tests whether or not the expression profiles of genomic features vary over time (or another continuous 			covariate) in the study. Default FALSE. Natural splines are used to fit time profiles, so you must have more timepoints 		than degrees of freedom used to fit the splines. The default df is 4.
+covariate	string representing the name of the covariate of interest for the differential expression tests. Must correspond to the 		name of a column of pData(gown). If timecourse=TRUE, this should be the study's time variable.
+adjustvars	optional vector of strings representing the names of potential confounders. Must correspond to names of columns of 			pData(gown).
+gexpr		optional data frame that is the result of calling gexpr(gown)). (You can speed this function up by pre-creating 			gexpr(gown).)
+df		degrees of freedom used for modeling expression over time with natural cubic splines. Default 4. Only used if 				timecourse=TRUE.
+getFC		if TRUE, also return estimated fold changes (adjusted for library size and confounders) between populations. Only 			available for 2-group comparisons at the moment. Default FALSE.
+libadjust	library-size adjustment to use in linear models. By default, the adjustment is defined as the sum of the sample's log 			expression measurements below the 75th percentile of those measurements. To use a different library-size adjustment, 			provide a numeric vector of each sample's adjustment value. Entries of this vector correspond to samples in in rows of 			pData. If no library size adjustment is desired, set to FALSE.
+log		if TRUE, outcome variable in linear models is log(expression+1), otherwise it's expression. Default TRUE.
+</pre>
+
