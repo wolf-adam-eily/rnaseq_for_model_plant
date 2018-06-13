@@ -11,7 +11,7 @@ This repository is a usable, publicly available tutorial for analyzing different
 <li><a href="#Fourth_Point_Header">4 Aligning reads to a genome using hisat2</a></li>
 <li><a href="#Fifth_Point_Header">5 Transcript assembly and quantification with StringTie</a></li>
 <li><a href="#Sixth_Point_Header">6 Differential expression analysis using ballgown</a></li>
-<li><a href="#EnTAP">Topological networking using cytoscape</a></li>
+<li><a href="#Seventh_Point_Header">Topological networking using cytoscape</a></li>
  <li><a href="#Integration">8 Integrating the DE Results with the Annotation Results</a></li>
 <li><a href="#Citation">Citations</a></li>
 </ul>
@@ -930,3 +930,33 @@ libadjust	library-size adjustment to use in linear models. By default, the adjus
 log		if TRUE, outcome variable in linear models is log(expression+1), otherwise it's expression. Default TRUE.
 </pre>
 
+We see we can determine which transcripts and genes are differentially expressed in the roots or shoots, alongside the fold changes of each differentially expressed gene as measured in FPKM with the following code:
+
+<pre style="color: silver; background: black;">results_transcripts = stattest(bg_filt, feature="transcript" , covariate = "part" , getFC = TRUE, meas = "FPKM")
+
+results_genes = stattest(bg_filt, feature="gene" , covariate = "part" , getFC = TRUE, meas = "FPKM")</pre>
+
+Now we want to order our results according to their pvalue, and then subset to only take results with pvalues below 0.01, writing our findings to a csv:
+
+<pre style="color: silver; background: black;">
+results_genes = arrange(results_genes,pval)
+
+results_genes = subset(results_genes, pval < 0.01)
+
+results_transcripts = arrange(results_transcripts, pval)
+
+results_transcripts = subset(results_transcripts, pval < 0.01)
+
+write.csv(results_transcripts, "transcript_results.csv", row.names=FALSE)
+
+write.csv(results_genes, "gene_results.csv", row.names=FALSE)
+
+&#35;&#35;we use row.names=FALSE because currently the row names are just the numbers 1, 2, 3. . .
+
+</pre>
+
+<h2 id="Seventh_Point_Header">Topological networking using cytoscape</h2>
+
+<a href="https://github.com/miriamposner/cytoscape_tutorials">Cytoscape</a> is a desktop program which creates visual topological networks of data. The only requirement to create a topological network in Cytospace is to have an "edge list". An edge list is a two-column list which comprises two separate types of data. Each row of the edge list is a single piece of information (so both columns combine to form a piece of infromation for the row) that Cytospace uses. Now, let's go over the two columns of an edge list:
+
+The two columns of an edge list represent the "sources" and "nodes" 
