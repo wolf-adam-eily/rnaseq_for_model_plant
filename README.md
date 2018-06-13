@@ -1109,7 +1109,7 @@ For this next step it is assumed that you are familiar with plotting in R. If no
 <pre style="color: silver; background: black;">
 plot.new()
 par(mfrow=c(1,1))
-plot(pca$points, type='n', xlab="", ylab="", main="PCA plot for all libraries")
+plot(pca[,1],pca[,2] type='n', xlab="", ylab="", main="PCA plot for all libraries")
 points(pca[,1], pca[,2], col="grey", cex=2, pch=16)
 text(pca[,1], pca[,1], short_names, col=c("red", "red", "hotpink", "hotpink")</pre>
 
