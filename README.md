@@ -822,11 +822,11 @@ We want all of the objects in our arguments to be in the same order as they are 
 
 Now we construct a 4x2 phenotype matrix with the first column being our samples in order and the second each sample's phenotype:
 
-<pre style="color: silver; background: black;">pheno_data = c("athaliana_root_1", "athaliana_root_2", "athaliana_shoot_1",  "athaliana_shoot_2","root","root","shoot","shoot")
+<pre style="color: silver; background: black;">pheno_data = c("athaliana_root_1", "athaliana_root_2", "athaliana_shoot_1",  "athaliana_shoot_2","root","root","shoot","shoot")</pre>
 
-&#35;&#35;R fills the rows of each column first. Therefore, our character vector contains all of column 1 in order, followed by all of
-&#35;&#35;column 2 in order. The end result will be our matrix.
+R fills the rows of each column first. Therefore, our character vector contains all of column 1 in order, followed by all of column 2 in order. The end result will be our matrix.
 
+<pre style="color: silver; background: black;">
 pheno_matrix = matrix(pheno_data, ncol=2)
 
 pheno_matrix = as.data.frame(pheno_matrix)
@@ -857,16 +857,17 @@ bg <- ballgown(dataDir = "ballgown", pData=pheno_matrix, samplePattern = "athali
 &#35;&#35;Wed Jun 13 11:12:41 2018: Merging transcript data
 &#35;&#35;Wrapping up the results
 &#35;&#35;Wed Jun 13 11:12:42 2018
+</pre>
+We filter our ballgown object to take only genes with <a href="https://en.wikipedia.org/wiki/Variance">variances</a> above 1 
+using <a href="https://www.rdocumentation.org/packages/metaMA/versions/3.1.2/topics/rowVars">rowVars()</a>.
 
-&#35;&#35;we filter our ballgown object to take only genes with <a href="https://en.wikipedia.org/wiki/Variance">variances</a> above 1 
-&#35;&#35;using <a href="https://www.rdocumentation.org/packages/metaMA/versions/3.1.2/topics/rowVars">rowVars()</a>
 
-??ballgown::subset</pre>
+<pre style="color: silver; background: black;">??ballgown::subset</pre>
 
 <pre>
 <strong style="color: blue;">subset ballgown objects to specific samples or genomic locations</strong>
 
-<strong style="color: grey;">"Description</strong>
+<strong style="color: grey;">Description</strong>
 
 <em style="color: green;">subset ballgown objects to specific samples or genomic locations</em>
 
@@ -892,10 +893,9 @@ To use subset, you must provide the cond argument as a string representing a log
 
 <br>
 
-<pre style="color: silver; background: black;">bg_filt = subset(bg, "rowVars(texpr(bg))>1", genomesubset=TRUE)
+<pre style="color: silver; background: black;">bg_filt = subset(bg, "rowVars(texpr(bg))>1", genomesubset=TRUE)</pre>
 
-&#35;&#35;we follow the guide and subset our ballgown object under the condition that the row-variances of the expression data are
-&#35;&#35;greater than one, keeping the gene names.</pre>
+We follow the guide and subset our ballgown object under the condition that the row-variances of the expression data are greater than one, keeping the gene names.</pre>
 
 To perform the isoform differential expression analysis we use ballgown's "stattest" function. Let's have a look at it:
 <pre style="color: silver; background: black;">??ballgown::stattest</pre>
@@ -954,7 +954,7 @@ log		if TRUE, outcome variable in linear models is log(expression+1), otherwise 
 </pre>
 
 We see we can determine which transcripts and genes are differentially expressed in the roots or shoots, alongside the fold changes of
-&#35;&#35;each differentially expressed gene as measured in FPKM with the following code:
+each differentially expressed gene as measured in FPKM with the following code:
 
 <pre style="color: silver; background: black;">results_transcripts = stattest(bg_filt, feature="transcript" , covariate = "part" , 
 getFC = TRUE, meas = "FPKM")
@@ -977,40 +977,34 @@ Now we want to visualize our data:
 
 <pre style="color: silver; background: black;">&#35;&#35;we want pretty colors for our visualization
 tropical = c('red', 'dodgerblue', 'hotpink', 'limegreen', 'yellow')
-palette(tropical)
-&#35;&#35;we want to compare our genes based on their FPKM values. We know from reading ballgown's vignette that we can extract the 
-&#35;&#35;expression data using texpr() and specifying a measure. 
+palette(tropical)</pre>
 
+We want to compare our genes based on their FPKM values. We know from reading ballgown's vignette that we can extract the 
+expression data using texpr() and specifying a measure. 
+
+<pre style="color: silver; background: black;">
 fpkm = texpr(bg, meas = "FPKM")
 &#35;&#35;let's look at the distribution
-plot(density(fpkm),main="Density Plot of \nUntransformed FPKM")
-&#35;&#35;We can see virtually nothing except that there are many, many genes that are lowly expressed. The reason for the sharp peak 
-&#35;&#35;is that the density plot automatically scales its x-axis from the lowest expressed to the highest expressed. Let's see what 
-&#35;&#35;those values are:
+plot(density(fpkm),main="Density Plot of \nUntransformed FPKM")</pre>
+We can see virtually nothing except that there are many, many genes that are lowly expressed. The reason for the sharp peak 
+is that the density plot automatically scales its x-axis from the lowest expressed to the highest expressed. Let's see what 
+those values are:
 
+<pre style="color: silver; background: black;">
 min(fpkm)
 &#35;&#35;0
 max(fpkm)
 &#35;&#35;1179157
+</pre>
+Because of this crazy scaling, we cannot truly see the distribution. However, what we <i>can</i> do is to transform the data such that the variance is not so staggering, allowing us to see better. There are a few rules for this, all of the data must be transformed in a consistent and reversible manner, after transformation no data may have a negative value, and all data with a value of 0 must also be 0 after transformation. The reason for the second and third rules is more epistemological. For us, if a gene has an FPKM of 0, then for that sample the gene is unexpressed. Should we transform the data and that particular gene's FPKM is now above 0, we are fundamentally changing the nature of that sample -- i.e., we are now saying it is expresesing a gene it actually is not! Additionally, there is no such thing as negative expression, so there is no physical reality where we will have an FPKM beneath 0. With these three rules, we see that taking the log of all our data will prevent negative values, be consistent and reversible, and scale down our variance. However, log(0) = -inf! We have broken a cardinal rule (oddly enough, the fact that it is infinity is not a rule-breaker, but rather that it is <b>negative</b> infinity! Seeing this, we can simply add 1 to our data before log transforming, log(0+1) = 0. Now we have fulfilled all three rules.
 
-&#35;&#35;because of this crazy scaling, we cannot truly see the distribution. However, what we <i>can</i> do is to transform the data 
-&#35;&#35;such that the variance is not so staggering, allowing us to see better. There are a few rules for this, all of the data must 
-&#35;&#35;be transformed in a consistent and reversible manner, after transformation no data may have a negative value, and all data 
-&#35;&#35;with a value of 0 must also be 0 after transformation. The reason for the second and third rules is more epistemological. For 
-&#35;&#35;us, if a gene has an FPKM of 0, then for that sample the gene is unexpressed. Should we transform the data and that 
-&#35;&#35;particular gene's FPKM is now above 0, we are fundamentally changing the nature of that sample -- i.e., we are now saying it 
-&#35;&#35;is expresesing a gene it actually is not! Additionally, there is no such thing as negative expression, so there is no 
-&#35;&#35;physical reality where we will have an FPKM beneath 0. With these three rules, we see that taking the log of all our data 
-&#35;&#35;will prevent negative values, be consistent and reversible, and scale down our variance. However, log(0) = -inf! We have 
-&#35;&#35;broken a cardinal rule (oddly enough, the fact that it is infinity is not a rule-breaker, but rather that it is 
-&#35;&#35;<b>negative</b> infinity! Seeing this, we can simply add 1 to our data before log transforming, log(0+1) = 0. Now we have 
-&#35;&#35;fulfilled all three rules.
-
+<pre style="color: silver; background: black;">
 fpkm = log2(fpkm + 1)
-plot(density(fpkm),main="Density Plot of \nTransformed Data")
-&#35;&#35;now we see an actual distribution. Let's see the difference in distribution between each individual part. To do this we are 
-&#35;&#35;going to plot the density for each part, one by one, and watch for great changes.
+plot(density(fpkm),main="Density Plot of \nTransformed Data")</pre>
 
+We now we see an actual distribution. Let's see the difference in distribution between each individual part. To do this we are going to plot the density for each part, one by one, and watch for great changes.
+
+<pre style="color: silver; background: black;">
 dim(fpkm)
 &#35;&#35;41854     4
 colnames(fpkm)
@@ -1019,28 +1013,23 @@ colnames(fpkm)
 plot(density(fpkm[,1]),main="Density Comparison")
 lines(density(fpkm[,2])
 lines(density(fpkm[,3])
-lines(density(fpkm[,4])
+lines(density(fpkm[,4])</pre>
 
-&#35;&#35;we see that overall the distributions are pretty similar, but not identical -- shoot 2 has the highest expression levels while root 2 has the lowest.
+We see that overall the distributions are pretty similar, but not identical -- shoot 2 has the highest expression levels while root 2 has the lowest.
 
-&#35;&#35;now we will generate a <a href="http://setosa.io/ev/principal-component-analysis/">PCA</a> plot. I strongly advise you read 
-&#35;&#35;the PCA link before continuing if you are not familiar with Principal Component Analysis. It will not be explained in this tutorial.
+Now we will generate a <a href="http://setosa.io/ev/principal-component-analysis/">PCA</a> plot. I strongly advise you read the PCA link before continuing if you are not familiar with Principal Component Analysis. It will not be explained in this tutorial.
 
-&#35;&#35;let's create a vector with our PCA point names
-
+Let's create a vector with our PCA point names
+<pre style="color: silver; background: black;">
 short_names = c("r1","r2","s1","s2")
-&#35;&#35;we are going to be using the <a href="https://en.wikipedia.org/wiki/Pearson_correlation_coefficient">Pearson coefficient</a> 
-&#35;&#35;for our PCA plot. You may think of the Pearson coefficient simply as a measure of similarity. If two datasets are very 
-&#35;&#35;similar, they will have a Pearson coefficient approaching 1 (every data compared to itself has a Pearson coefficient of 1). 
-&#35;&#35;If two datasets are very dissimilar, they will have a Pearson coefficient approaching 0 Let's calculate a vector containing 
-&#35;&#35;the correlation coefficient
-	
-r = cor(fpkm, use="pairwise.complete.obs", method="pearson")
-&#35;&#35;the cor() function takes our expression matrix, as well as two other arguments. the "pairwise.complete.obs" argument tells R 
-&#35;&#35;that we want to do a pairwise analysis (so compare column 1 to 2, 3, and 4, then column 2 to 3 and 4, and lastly column 3 to 
-&#35;&#35;4) only on observations (genes) without missing values. Lastly, our method "pearson" tells us we're using the Pearson method 
-&#35;&#35;as a similarity metric. Let's have a look at r
+</pre>
+We are going to be using the <a href="https://en.wikipedia.org/wiki/Pearson_correlation_coefficient">Pearson coefficient</a> for our PCA plot. You may think of the Pearson coefficient simply as a measure of similarity. If two datasets are very similar, they will have a Pearson coefficient approaching 1 (every data compared to itself has a Pearson coefficient of 1). If two datasets are very dissimilar, they will have a Pearson coefficient approaching 0 Let's calculate a vector containing the correlation coefficient:
 
+<pre style="color: silver; background: black;">
+r = cor(fpkm, use="pairwise.complete.obs", method="pearson")</pre>
+The cor() function takes our expression matrix, as well as two other arguments. the "pairwise.complete.obs" argument tells R that we want to do a pairwise analysis (so compare column 1 to 2, 3, and 4, then column 2 to 3 and 4, and lastly column 3 to 4) only on observations (genes) without missing values. Lastly, our method "pearson" tells us we're using the Pearson method as a similarity metric. Let's have a look at r:
+
+<pre style="color: silver; background: black;">
 r
 
 <strong style="color:blue;">				FPKM.athaliana_root_1 FPKM.athaliana_root_2 FPKM.athaliana_shoot_1 FPKM.athaliana_shoot_2
@@ -1049,13 +1038,12 @@ FPKM.athaliana_root_2              0.9127575             1.0000000              
 FPKM.athaliana_shoot_1             0.7254296             0.7247305              1.0000000		0.8877891
 FPKM.athaliana_shoot_2             0.7639201             0.7661130              0.8877891		1.0000000</strong>
 
-&#35;&#35;here we see each member of the diagonal is 1.000000. Of course we knew this already, as each member is 100% similar to 
-&#35;&#35;itself! Then we have the similarity measures of each sample to each other sample.
+</pre>
+Here we see each member of the diagonal is 1.000000. Of course we knew this already, as each member is 100% similar to itself! Then we have the similarity measures of each sample to each other sample.
 
-&#35;&#35;rather than calculate the similarity, it would be nicer to calculate the dissimilarity or distance between each sample. We 
-&#35;&#35;know that if two samples are the same, their similarity measure is 1.000000. We also know that then their dissimilarity is 
-&#35;&#35;0%, or 0.000000. Here we see that if we subtract each element from 1, we get the dissimilarity matrix! Let's do it:
+Rather than calculate the similarity, it would be nicer to calculate the dissimilarity or distance between each sample. We know that if two samples are the same, their similarity measure is 1.000000. We also know that then their dissimilarity is 0%, or 0.000000. Here we see that if we subtract each element from 1, we get the dissimilarity matrix! Let's do it:
 
+<pre style="color: silver; background: black;">
 d = 1 - r
 d
 <strong style="color:blue;">
@@ -1065,9 +1053,10 @@ FPKM.athaliana_root_2             0.08724246            0.00000000              
 FPKM.athaliana_shoot_1            0.27457045            0.27526946              0.0000000	0.1122109
 FPKM.athaliana_shoot_2            0.23607994            0.23388696              0.1122109	0.0000000
 </strong>
-&#35;&#35;R has a function which will perform the principal component analysis for us when provided with a dissimilarity matrix, 
-&#35;&#35;cmdscale. Let's have a look at it:
+</pre>
+R has a function which will perform the principal component analysis for us when provided with a dissimilarity matrix, cmdscale. Let's have a look at it:
 
+<pre style="color: silver; background: black;">
 help(cmdscale)</pre>
 
 <pre style="color: silver; background: black;"><strong style="color: blue;">Classical (Metric) Multidimensional Scaling</strong>
@@ -1102,11 +1091,10 @@ When add = TRUE, a minimal additive constant c* is computed such that the dissim
 
 Let's perform our principal component analysis:
 
-<pre style="color: silver; background: black;">pca = cmdscale(d, k=2)
-&#35;&#35;so we expect pca to have four rows, each row corresponding to a sample, and two columns, the first column representing our 
-&#35;&#35;first coordinate axis and the second dimension representing our second coordinate axis. If we plot the first column against 
-&#35;&#35;the second column, the distances between points is the dissimilarity between points.
+<pre style="color: silver; background: black;">pca = cmdscale(d, k=2)</pre>
+We expect pca to have four rows, each row corresponding to a sample, and two columns, the first column representing our first coordinate axis and the second dimension representing our second coordinate axis. If we plot the first column against the second column, the distances between points is the dissimilarity between points.
 
+<pre style="color: silver; background: black;">
 pca
 
 <strong style="color:blue;">			[,1]         [,2]
@@ -1115,9 +1103,10 @@ FPKM.athaliana_root_2  -0.1225334  0.006751752
 FPKM.athaliana_shoot_1  0.1454597 -0.045779068
 FPKM.athaliana_shoot_2  0.1000175  0.055096980</strong>
 
-&#35;&#35;for this next step it is assumed that you are familiar with plotting in R. If not you may look <a 
-&#35;&#35;href="https://bioinformatics.uconn.edu/introduction-to-r/">here</a>
+</pre>
+For this next step it is assumed that you are familiar with plotting in R. If not you may look <a href="https://bioinformatics.uconn.edu/introduction-to-r/">here</a>.
 
+<pre style="color: silver; background: black;">
 plot.new()
 par(mfrow=c(1,1))
 plot(pca$points, type='n', xlab="", ylab="", main="PCA plot for all libraries")
