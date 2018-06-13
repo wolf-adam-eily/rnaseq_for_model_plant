@@ -1002,7 +1002,7 @@ lines(density(fpkm[,4])
 
 short_names = c("r1","r2","s1","s2")
 
-&#35;&#35;we are going to be using the <a href="https://en.wikipedia.org/wiki/Pearson_correlation_coefficient>Pearson coefficient</a> for our PCA plot. You may think of the Pearson coefficient simply as a measure of similarity. If two datasets are very similar, they will have a Pearson coefficient approaching 1 (every data compared to itself has a Pearson coefficient of 1). If two datasets are very dissimilar, they will have a Pearson coefficient approaching 0 Let's calculate a vector containing the correlation coefficient
+&#35;&#35;we are going to be using the <a href="https://en.wikipedia.org/wiki/Pearson_correlation_coefficient">Pearson coefficient</a> for our PCA plot. You may think of the Pearson coefficient simply as a measure of similarity. If two datasets are very similar, they will have a Pearson coefficient approaching 1 (every data compared to itself has a Pearson coefficient of 1). If two datasets are very dissimilar, they will have a Pearson coefficient approaching 0 Let's calculate a vector containing the correlation coefficient
 	
 r = cor(fpkm, use="pairwise.complete.obs", method="pearson")
 
