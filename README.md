@@ -473,8 +473,233 @@ Chr1	TAIR10	CDS	3996	4276	.	+	2	Parent=AT1G01010.1,AT1G01010.1-Protein;
 Chr1	TAIR10	exon	4486	4605	.	+	.	Parent=AT1G01010.1
 </pre>
 
-The GFF file is quite self-explanatory. However, it'd be nice if could combine all of the pieces of information from the GFF into something better. For instance, if there are multiple overlapping, but distinct exons from a single gene, we could use that information to determine the isoforms of that gene. Then, we could make a file which gives each isoform its own track (there are other extrapolations to be made, but this is our most relevant example). Luckily for us, we can use the program "gffread" to transform our GFF file into the more useful form just stated, The output of <a href="https://github.com/gpertea/gffread">gffread --help</a> is much too dense for us to go into here. Therefore, the code for converting out GFF file to GTF will be placed here with no explanation (it is, although, somewhat self-explanatory).
+The GFF file is quite self-explanatory. However, it'd be nice if could combine all of the pieces of information from the GFF into something better. For instance, if there are multiple overlapping, but distinct exons from a single gene, we could use that information to determine the isoforms of that gene. Then, we could make a file which gives each isoform its own track (there are other extrapolations to be made, but this is our most relevant example). Luckily for us, we can use the program "gffread" to transform our GFF file into the more useful form just stated, The output of <a href="https://github.com/gpertea/gffread">gffread --help</a> is much too dense for us to go into here, but the necessary options will be explained. Do not run this code! We are compiling this code with various other chunks into one script, be patient!
 
+<pre style="color: silver; background: black;">bash-4.2$ module load gffread
+gffread TAR10_GFF3_genes.gff -T -o athaliana_TAIR10_genes.gtf</pre>
 
+The option -T tells gffread to convert our input into the gtf format, and the option -o simply is how we call the output. The GTF format is simply the transcript assembly file, and is composed of exons and coding sequences. Let's have a look at the GTF file:
+
+<pre style="color: silver; background: black;">-bash-4.2$ head athaliana_TAIR10_genes.gtf 
+Chr1	TAIR10	exon	3631	3913	.	+	.	transcript_id "AT1G01010.1"; gene_id "AT1G01010"; gene_name "AT1G01010";
+Chr1	TAIR10	exon	3996	4276	.	+	.	transcript_id "AT1G01010.1"; gene_id "AT1G01010"; gene_name "AT1G01010";
+Chr1	TAIR10	exon	4486	4605	.	+	.	transcript_id "AT1G01010.1"; gene_id "AT1G01010"; gene_name "AT1G01010";
+Chr1	TAIR10	exon	4706	5095	.	+	.	transcript_id "AT1G01010.1"; gene_id "AT1G01010"; gene_name "AT1G01010";
+Chr1	TAIR10	exon	5174	5326	.	+	.	transcript_id "AT1G01010.1"; gene_id "AT1G01010"; gene_name "AT1G01010";
+Chr1	TAIR10	exon	5439	5899	.	+	.	transcript_id "AT1G01010.1"; gene_id "AT1G01010"; gene_name "AT1G01010";
+Chr1	TAIR10	CDS	3760	3913	.	+	0	transcript_id "AT1G01010.1"; gene_id "AT1G01010"; gene_name "AT1G01010";
+Chr1	TAIR10	CDS	3996	4276	.	+	2	transcript_id "AT1G01010.1"; gene_id "AT1G01010"; gene_name "AT1G01010";
+Chr1	TAIR10	CDS	4486	4605	.	+	0	transcript_id "AT1G01010.1"; gene_id "AT1G01010"; gene_name "AT1G01010";
+Chr1	TAIR10	CDS	4706	5095	.	+	0	transcript_id "AT1G01010.1"; gene_id "AT1G01010"; gene_name "AT1G01010";
+
+-bash-4.2$ tail athaliana_TAIR10_genes.gtf 
+ChrM	TAIR10	exon	349830	351413	.	-	.	transcript_id "ATMG01360.1"; gene_id "ATMG01360"; gene_name "ATMG01360";
+ChrM	TAIR10	CDS	349830	351413	.	-	0	transcript_id "ATMG01360.1"; gene_id "ATMG01360"; gene_name "ATMG01360";
+ChrM	TAIR10	exon	360717	361052	.	-	.	transcript_id "ATMG01370.1"; gene_id "ATMG01370"; gene_name "ATMG01370";
+ChrM	TAIR10	CDS	360717	361052	.	-	0	transcript_id "ATMG01370.1"; gene_id "ATMG01370"; gene_name "ATMG01370";
+ChrM	TAIR10	exon	361062	361179	.	-	.	transcript_id "ATMG01380.1"; gene_id "ATMG01380"; gene_name "ATMG01380";
+ChrM	TAIR10	exon	361350	363284	.	-	.	transcript_id "ATMG01390.1"; gene_id "ATMG01390"; gene_name "ATMG01390";
+ChrM	TAIR10	exon	363725	364042	.	+	.	transcript_id "ATMG01400.1"; gene_id "ATMG01400"; gene_name "ATMG01400";
+ChrM	TAIR10	CDS	363725	364042	.	+	0	transcript_id "ATMG01400.1"; gene_id "ATMG01400"; gene_name "ATMG01400";
+ChrM	TAIR10	exon	366086	366700	.	-	.	transcript_id "ATMG01410.1"; gene_id "ATMG01410"; gene_name "ATMG01410";
+ChrM	TAIR10	CDS	366086	366700	.	-	0	transcript_id "ATMG01410.1"; gene_id "ATMG01410"; gene_name "ATMG01410";
+</pre>
+
+We see that whereas in our GFF file we have various untranslated regions included, as well as annotations, the GTF format contains information only on various transcripts for each gene. The "transcript_id" denoter in the last column tells us the gene and its isoform, and everything else about the GTF file is quite apparent!
+
+Just as was stated for our conversion from gff to gtf, it would be helpful for us to perform the same operation on our aligned reads. That is, if there are multiple, overlapping but distinct reads from a single gene, we could combine these reads into one transcript isoform. Because we have the gene isoforms in the gtf file, we can re-map each assembled transcript to a gene isoform and then count how many mappings there are per isoform. This, in effect, allows us to quantify the expression rates of each isoform. We will be using the program <a href="http://ccb.jhu.edu/software/stringtie/index.shtml?t=manual">StringTie</a> to assemble the transcripts for each sample. StringTie requires three input arguments: the BAM alignment file, the genomic GTF file, and the desired output GTF filename. Thus, our code will look like (do not run this!):
+
+<pre style="color: silver; background: black;">bash-4.2$ module load stringtie
+
+stringtie -p 16 athaliana_root_1.bam -G athaliana_TAIR10_genes.gtf -o athaliana_root_1.gtf
+
+stringtie -p 16 athaliana_root_2.bam -G athaliana_TAIR10_genes.gtf -o athaliana_root_2.gtf
+
+stringtie -p 16 athaliana_shoot_1.bam -G athaliana_TAIR10_genes.gtf -o athaliana_shoot_1.gtf
+
+stringtie -p 16 athaliana_shoot_2.bam -G athaliana_TAIR10_genes.gtf -o athaliana_shoot_2.gtf</pre>
+
+Let's have a look at the stringtie output:
+
+<pre style="color: silver; background: black;">-bash-4.2$ athaliana_root_1.gtf
+# stringtie -p 16 rnaseq_athaliana_root_1.bam -G athaliana_TAIR10_genes.gtf -o rnaseq_athaliana_root_1.gtf
+# StringTie version 1.3.3b
+Chr1	StringTie	transcript	28500	28706	1000	+	.	gene_id "STRG.1"; transcript_id "STRG.1.1"; reference_id "AT1G01046.1"; ref_gene_id "AT1G01046"; ref_gene_name "AT1G01046"; cov "0.241546"; FPKM "3.727008"; TPM "0.747930";
+Chr1	StringTie	exon	28500	28706	1000	+	.	gene_id "STRG.1"; transcript_id "STRG.1.1"; exon_number "1"; reference_id "AT1G01046.1"; ref_gene_id "AT1G01046"; ref_gene_name "AT1G01046"; cov "0.241546";
+Chr1	StringTie	transcript	47494	48839	1000	-	.	gene_id "STRG.2"; transcript_id "STRG.2.1"; cov "3.928230"; FPKM "60.611832"; TPM "12.163484";
+Chr1	StringTie	exon	47494	47982	1000	-	.	gene_id "STRG.2"; transcript_id "STRG.2.1"; exon_number "1"; cov "4.529652";
+Chr1	StringTie	exon	48075	48839	1000	-	.	gene_id "STRG.2"; transcript_id "STRG.2.1"; exon_number "2"; cov "3.543791";
+Chr1	StringTie	transcript	50075	51199	1000	-	.	gene_id "STRG.3"; transcript_id "STRG.3.1"; reference_id "AT1G01100.2"; ref_gene_id "AT1G01100"; ref_gene_name "AT1G01100"; cov "8.437494"; FPKM "130.188904"; TPM "26.126097";
+Chr1	StringTie	exon	50075	50337	1000	-	.	gene_id "STRG.3"; transcript_id "STRG.3.1"; exon_number "1"; reference_id "AT1G01100.2"; ref_gene_id "AT1G01100"; ref_gene_name "AT1G01100"; cov "6.228601";
+Chr1	StringTie	exon	50419	50631	1000	-	.	gene_id "STRG.3"; transcript_id "STRG.3.1"; exon_number "2"; reference_id "AT1G01100.2"; ref_gene_id "AT1G01100"; ref_gene_name "AT1G01100"; cov "9.487524";
+</pre>
+
+While this is certainly confusing, we can still understand it. To start each row we have the chromosome for each sequence. The second column is the software used to assemble the transcript, in our case StringTie. The third column is the sequence type, either a transcript or an exon. The next two columns are the start and end bp of the feature (assuming the chromosome starts at bp 1), followed by another column which is the score. The column after the score is either "+" or "-" for forward strand and reverse strand, respectively. Our last two columns are the frame ("." means frame not determined) and the feature meta-information. 
+
+You may be wondering about the last three columns which are not standard in GTF. The column "cov" is simply the covariance of the gene across samples (if the gene is highly or lowly expressed in both samples the covariance will be high, if it is highly expressed in one sample and lowly expressed in another sample, the covariance will be low). The FPKM column is the fragment per kilobase million value. Simply put, this is the number of times the specific feature was counted divided by how many counts there were for all features combined, in millions. That number is then divided by the length of the feature in kilobases. The reason for this being that longer features should have higher counts. For instance, when we split our mRNA in sequences of 50 or less for reading, one 5000 bp transcript will appear as 100 counts, and one 500 bp transcript will appear as 10 counts. Now, let's divide each count by the transcript length in kilobases: we have 20 as the value for the 5000 bp sequence (100/(5000/1000)) and 20 as the value for the 500 bp sequence (10/(500/1000)! Now our quantification matches the actual expression profile -- that is, both features were transcribed the same amount.
+
+The last column, TPM, is the transcripts per feature per  million transcripts counted across all features combined. As evident from the example above, without some sort of scaling factor, this value is highly misleading.
+
+The assembled isoforms in each sample are most likely different from those of other samples. However, we may repeat the process of determining isoforms but this time using the gtf files for all four samples. That is, if there are isoforms across the sample gtfs which overlap but are distinct, we may merge those into a single isoform. To do this we will be using the --merge option of stringtie. The --merge option of stringtie requires three input arguments: the genomic GTF file, the desired output filename, and a plain-text file containing each file to be merged separated by a return. To begin, let's make our plain-text file:
+
+<pre style="color: silver; background: black;">bash-4.2$ nano mergelist.txt
+
+  GNU nano 2.3.1                                                      File: mergelist.txt                                                                                                                   
+
+athaliana_root_1.gtf
+athaliana_root_2.gtf
+athaliana_shoot_1.gtf
+athaliana_shoot_2.gtf
+                                                                                              [ Read 4 lines ]
+^G Get Help                       ^O WriteOut                       ^R Read File                      ^Y Prev Page                      ^K Cut Text                       ^C Cur Pos
+^X Exit                           ^J Justify                        ^W Where Is                       ^V Next Page                      ^U UnCut Text                     ^T To Spell
+
+</pre>
+
+After saving our plain-text file, we can merge our samples using the following code (do not run this!):
+
+<pre style="color: silver; background: black;">bash-4.2$ module load stringtie
+stringtie --merge -p 16 -G -o merged stringtie_merged.gtf</pre>
+
+While the options are quite self-explanatory, one thing to note is that the "-o" option is simply the output <i>prefix</i>. After running, you should see the following files in your directory (but hopefully you listened and did not run it yet!):
+
+<pre style="color: silver; background: black;">bash-4.2$ ls
+merged.annotated.gtf
+merged.loci
+merged.stats
+merged.stringtie_merged.gtf.refmap
+merged.stringtie_merged.gtf.tmap
+merged.tracking</pre>
+
+Although you have not run the code yet, let's have a look at some of the files we've generated (we will not be looking at the merged.annotated.gtf as we are already quite familiar with the gtf format!)
+
+<pre style="color: silver; background: black;">bash-4.2$ -bash-4.2$ head merged.loci
+XLOC_000001	Chr1[+]3631-5899	AT1G01010|AT1G01010.1	AT1G01010.1
+XLOC_000002	Chr1[+]23146-31227	AT1G01040|AT1G01040.1,AT1G01040|AT1G01040.2	AT1G01040.1,AT1G01040.2
+XLOC_000003	Chr1[+]28500-28706	AT1G01046|AT1G01046.1	AT1G01046.1
+XLOC_000004	Chr1[+]44677-44787	AT1G01073|AT1G01073.1	AT1G01073.1
+XLOC_000005	Chr1[+]52239-54692	AT1G01110|AT1G01110.2,AT1G01110|AT1G01110.1	AT1G01110.2,AT1G01110.1
+XLOC_000006	Chr1[+]56624-56740	AT1G01115|AT1G01115.1	AT1G01115.1
+XLOC_000007	Chr1[+]72339-74096	AT1G01160|AT1G01160.1,AT1G01160|AT1G01160.2	AT1G01160.1,AT1G01160.2
+XLOC_000008	Chr1[+]75583-76758	AT1G01180|AT1G01180.1	AT1G01180.1
+XLOC_000009	Chr1[+]88898-89745	AT1G01210|AT1G01210.1	AT1G01210.1
+XLOC_000010	Chr1[+]91376-95651	AT1G01220|AT1G01220.1	AT1G01220.1</pre>
+
+We see we have a condensed form of our various exons. The exon loci name is the first column, followed by the chromosome, strand, and bp location in the second column. The final columns are the gene ID, the transcript IDs to which the loci belong, and the isoforms to which the transcripts belong.
+
+<pre style="color: silver; background: black;">-bash-4.2$ nano merged.stats
+
+  GNU nano 2.3.1                                                      File: merged.stats                                                                                                                    
+
+# gffcompare v0.10.4 | Command line was:
+#gffcompare -r athaliana_TAIR10_genes.gtf -G -o merged stringtie_merged.gtf
+#
+
+#= Summary for dataset: stringtie_merged.gtf
+#     Query mRNAs :   41854 in   33403 loci  (30272 multi-exon transcripts)
+#            (6013 multi-transcript loci, ~1.3 transcripts per locus)
+# Reference mRNAs :   41607 in   33350 loci  (30127 multi-exon)
+# Super-loci w/ reference transcripts:    33184
+#-----------------| Sensitivity | Precision  |
+        Base level:   100.0     |    99.9    |
+        Exon level:   100.0     |    99.9    |
+      Intron level:   100.0     |   100.0    |
+Intron chain level:   100.0     |    99.5    |
+  Transcript level:   100.0     |    99.4    |
+       Locus level:   100.0     |    99.8    |
+
+     Matching intron chains:   30127
+       Matching transcripts:   41607
+              Matching loci:   33350
+
+          Missed exons:       0/169264  (  0.0%)
+           Novel exons:      90/169578  (  0.1%)
+        Missed introns:       0/127896  (  0.0%)
+         Novel introns:      13/127951  (  0.0%)
+           Missed loci:       0/33350   (  0.0%)
+            Novel loci:      75/33403   (  0.2%)
+
+ Total union super-loci across all input datasets: 33403
+41854 out of 41854 consensus transcripts written in merged.annotated.gtf (0 discarded as redundant)
+
+                                                                                             [ Read 30 lines ]
+^G Get Help                       ^O WriteOut                       ^R Read File                      ^Y Prev Page                      ^K Cut Text                       ^C Cur Pos
+^X Exit                           ^J Justify                        ^W Where Is                       ^V Next Page                      ^U UnCut Text                     ^T To Spell
+</pre>
+
+The information here is quite apparent.
+
+<pre style="color: silver; background: black;">-bash-4.2$ head merged.stringtie_merged.gtf.refmap
+ref_gene_id	ref_id	class_code	qry_id_list
+AT1G01010	AT1G01010.1	=	AT1G01010|AT1G01010.1
+AT1G01040	AT1G01040.1	=	AT1G01040|AT1G01040.1
+AT1G01040	AT1G01040.2	=	AT1G01040|AT1G01040.2
+AT1G01046	AT1G01046.1	=	AT1G01046|AT1G01046.1
+AT1G01073	AT1G01073.1	=	AT1G01073|AT1G01073.1
+AT1G01110	AT1G01110.2	=	AT1G01110|AT1G01110.2
+AT1G01110	AT1G01110.1	=	AT1G01110|AT1G01110.1
+AT1G01115	AT1G01115.1	=	AT1G01115|AT1G01115.1
+AT1G01160	AT1G01160.1	=	AT1G01160|AT1G01160.1
+</pre>
+
+Here we have the gene IDs from the reference GFF, followed by the isoform IDs from the reference GTF, the "class_code" which simply tells you that the last column was matched fully ("=") or partially ("c"). Taking our first column, we see that all of isoform ATG01010.1 was matched to the gene ATG01010.
+
+<pre style="color: silver; background: black;">-bash-4.2$ head merged.stringtie_merged.gtf.tmap
+ref_gene_id	ref_id	class_code	qry_gene_id	qry_id	num_exons	FPKM	TPM		cov	len	major_iso_id	ref_match_len
+AT1G01090	AT1G01090.1	=	AT1G01090	AT1G01090.1	3	0.000000	0.000000	0.000000	1627	AT1G01090.1	1627
+AT1G01100	AT1G01100.2	=	AT1G01100	AT1G01100.2	4	0.000000	0.000000	0.000000	631	AT1G01100.2	631
+AT1G01100	AT1G01100.1	=	AT1G01100	AT1G01100.1	4	0.000000	0.000000	0.000000	587	AT1G01100.2	587
+AT1G01100	AT1G01100.4	=	AT1G01100	AT1G01100.4	4	0.000000	0.000000	0.000000	607	AT1G01100.2	607
+AT1G01100	AT1G01100.3	=	AT1G01100	AT1G01100.3	5	0.000000	0.000000	0.000000	566	AT1G01100.2	566
+AT1G01120	AT1G01120.1	=	AT1G01120	AT1G01120.1	1	0.000000	0.000000	0.000000	1899	AT1G01120.1	1899
+AT1G01180	AT1G01180.1	=	AT1G01180	AT1G01180.1	1	0.000000	0.000000	0.000000	1176	AT1G01180.1	1176
+AT1G01183	AT1G01183.1	=	AT1G01183	AT1G01183.1	1	0.000000	0.000000	0.000000	101	AT1G01183.1	101
+AT1G01225	AT1G01225.1	=	AT1G01225	AT1G01225.1	2	0.000000	0.000000	0.000000	1025	AT1G01225.1	1025
+</pre>
+
+All of the information in the .tmap file may be readily understood now, knowing that "len" and "ref_match_len" are the sequence lengths and reference lengths, respectively.
+
+Lastly,
+<pre style="color: silver; background: black;">-bash-4.2$ head merged.tracking
+TCONS_00000001	XLOC_000001	AT1G01010|AT1G01010.1	=	q1:AT1G01010|AT1G01010.1|6|0.000000|0.000000|0.000000|1688
+TCONS_00000002	XLOC_000002	AT1G01040|AT1G01040.1	=	q1:AT1G01040|AT1G01040.1|20|0.000000|0.000000|0.000000|6251
+TCONS_00000003	XLOC_000002	AT1G01040|AT1G01040.2	=	q1:AT1G01040|AT1G01040.2|20|0.000000|0.000000|0.000000|5877
+TCONS_00000004	XLOC_000003	AT1G01046|AT1G01046.1	=	q1:AT1G01046|AT1G01046.1|1|0.000000|0.000000|0.000000|207
+TCONS_00000005	XLOC_000004	AT1G01073|AT1G01073.1	=	q1:AT1G01073|AT1G01073.1|1|0.000000|0.000000|0.000000|111
+TCONS_00000006	XLOC_000005	AT1G01110|AT1G01110.2	=	q1:AT1G01110|AT1G01110.2|5|0.000000|0.000000|0.000000|1782
+TCONS_00000007	XLOC_000005	AT1G01110|AT1G01110.1	=	q1:AT1G01110|AT1G01110.1|3|0.000000|0.000000|0.000000|1439
+TCONS_00000008	XLOC_000006	AT1G01115|AT1G01115.1	=	q1:AT1G01115|AT1G01115.1|1|0.000000|0.000000|0.000000|117
+TCONS_00000009	XLOC_000007	AT1G01160|AT1G01160.1	=	q1:AT1G01160|AT1G01160.1|5|0.000000|0.000000|0.000000|1045
+TCONS_00000010	XLOC_000007	AT1G01160|AT1G01160.2	=	q1:AT1G01160|AT1G01160.2|6|0.000000|0.000000|0.000000|1129
+</pre>
+
+the merged.tracking is the compact form of tmap file combined with the loci file. The last column has the gene, gene isoform, number of hits, FPKM, TPM, cov, and length all in that order.
+
+Our last step is to create a count-table for the differential expression software "ballgown". A word of note about ballgown, ballgown requires that all of the files it will analyze be in their own parent directory, "ballgown", and furthermore each file is in its own subdirectory "ballgown/file_sub/file". Knowing we have four files, let's create the required structure for ballgown (run this):
+
+<pre style="color: silver; background: black;">-bash-4.2$ mkdir ballgown
+-bash-4.2$ cd ballgown
+-bash-4.2$ mkdir athaliana_root_1
+-bash-4.2$ mkdir athaliana_root_2
+-bash-4.2$ mkdir athaliana_shoot_1
+-bash-4.2$ mkdir athaliana_shoot_2
+-bash-4.2$ cd -</pre>
+
+The reason for this will become obvious soon. Now we will use StringTie to make our count tables (do not run this!):
+
+<pre style="color: silver; background: black;">-bash-4.2$ module load stringtie
+
+stringtie -e -B -p 16 athaliana_root_1.bam -G stringtie_merged.gtf -o ballgown/athaliana_root_1/athaliana_root_1.count
+
+stringtie -e -B -p 16 athaliana_root_2.bam -G stringtie_merged.gtf -o ballgown/athaliana_root_2/athaliana_root_2.count
+
+stringtie -e -B -p 16 athaliana_shoot_1.bam -G stringtie_merged.gtf -o ballgown/athaliana_shoot_1/athaliana_shoot_1.count
+
+stringtie -e -B -p 16 athaliana_shoot_2.bam -G stringtie_merged.gtf -o ballgown/athaliana_shoot_2/athaliana_shoot_2.count
+</pre>
+
+Now we are ready to compile all of our code into a single script:
+
+<pre style="color: silver; background: black;">-bash-4.2$ nano transcript_assembly.sh
 
 
