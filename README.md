@@ -784,13 +784,13 @@ You should see the "ballgown" folder after the list.files() command.
 
 Let's have a look at the ballgown function:
 
-<pre style="color: silver; background: black;">help("ballgown")</pre>
+<pre style="color: silver; background: black;">help("ballgown")
 
 <strong>constructor function for ballgown objects</strong>
 
 <strong>Description</strong>
 
-<em>constructor function for ballgown objects</e<
+<em>constructor function for ballgown objects</em>
 
 <strong>Usage</strong>
 
