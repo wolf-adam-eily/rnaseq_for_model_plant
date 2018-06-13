@@ -93,7 +93,8 @@ NCAGTTTTGACCAGATAGGTCTCGCTAAGAAGATTGAGAAGATCGGAAGA
 +SRR3498212.2 SN638:767:HC555BCXX:1:1108:2934:1998 length=50
 #<<<BDFFEEHIIIHIHEHEHIIEHHHH?<GCCCHCCGICHH1<GHHHIC
 @SRR3498212.3 SN638:767:HC555BCXX:1:1108:3860:2000 length=50
-NTCGCTTCGTAAGCGAAAGGCCGCGAGTTCGAAGATCGGAAGAGCACACG</pre>
+NTCGCTTCGTAAGCGAAAGGCCGCGAGTTCGAAGATCGGAAGAGCACACG
+</pre>
 
 We see that for our first three runs we have information about the sampled read including its length followed by the nucleotide read and then a "+" sign. The "+" sign marks the beginning of the corresponding scores for each nucleotide read for the nucleotide sequence preceding the "+" sign. 
 
