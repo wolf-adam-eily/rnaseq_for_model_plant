@@ -1120,7 +1120,8 @@ text(pca[,1], pca[,1], short_names, col=c("red", "red", "hotpink", "hotpink")</p
 
 The two columns of an edge list represent the "sources" and "nodes". You may instead think of the two columns representing an object and its group. For instance, the edge list:
 
-<pre style="color: silver; background: black;">A	1
+<pre style="color: silver; background: black;">
+	A	1
 	B	1
 	C	4
 	D	3
