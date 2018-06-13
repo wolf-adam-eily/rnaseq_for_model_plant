@@ -5,13 +5,13 @@ This repository is a usable, publicly available tutorial for analyzing different
 <div id="toc_container">
 <p class="toc_title">Contents</p>
 <ul class="toc_list">
-<li><a href="#First_Point_Header">1 Introduction and Programs</>
+<li><a href="#First_Point_Header">1 Introduction and programs</>
 <li><a href="#Second_Point_Header">2 Accessing the data using sra-toolkit</a></li>
 <li><a href="#Third_Point_Header">3 Quality control using sickle</a></li>
 <li><a href="#Fourth_Point_Header">4 Aligning reads to a genome using hisat2</a></li>
 <li><a href="#Fifth_Point_Header">5 Transcript assembly and quantification with StringTie</a></li>
-<li><a href="#Sixth_Point_Header">6 Pairwise differential expression with counts in R with DESeq2</a></li>
-<li><a href="#EnTAP">7 EnTAP: Functional Annotation for Genomes</a></li>
+<li><a href="#Sixth_Point_Header">6 Differential expression analysis using ballgown</a></li>
+<li><a href="#EnTAP">Topological networking using cytoscape</a></li>
  <li><a href="#Integration">8 Integrating the DE Results with the Annotation Results</a></li>
 <li><a href="#Citation">Citations</a></li>
 </ul>
@@ -476,7 +476,7 @@ Chr1	TAIR10	exon	4486	4605	.	+	.	Parent=AT1G01010.1
 The GFF file is quite self-explanatory. However, it'd be nice if could combine all of the pieces of information from the GFF into something better. For instance, if there are multiple overlapping, but distinct exons from a single gene, we could use that information to determine the isoforms of that gene. Then, we could make a file which gives each isoform its own track (there are other extrapolations to be made, but this is our most relevant example). Luckily for us, we can use the program "gffread" to transform our GFF file into the more useful form just stated, The output of <a href="https://github.com/gpertea/gffread">gffread --help</a> is much too dense for us to go into here, but the necessary options will be explained. Do not run this code! We are compiling this code with various other chunks into one script, be patient!
 
 <pre style="color: silver; background: black;">bash-4.2$ module load gffread
-gffread TAR10_GFF3_genes.gff -T -o athaliana_TAIR10_genes.gtf</pre>
+gffread TAIR10_GFF3_genes.gff -T -o athaliana_TAIR10_genes.gtf</pre>
 
 The option -T tells gffread to convert our input into the gtf format, and the option -o simply is how we call the output. The GTF format is simply the transcript assembly file, and is composed of exons and coding sequences. Let's have a look at the GTF file:
 
@@ -702,4 +702,244 @@ Now we are ready to compile all of our code into a single script:
 
 <pre style="color: silver; background: black;">-bash-4.2$ nano transcript_assembly.sh
 
+ GNU nano 2.3.1                                                   File: transcript_assembly.sh                                                                                                             
 
+#!/bin/bash
+#SBATCH --job-name=sam_sort_bam
+#SBATCH --mail-user=wolf.adam.eily@gmail.com
+#SBATCH --mail-type=ALL
+#SBATCH -n 1
+#SBATCH -N 1
+#SBATCH -c 16
+#SBATCH --mem=120G
+#SBATCH -o sam_sort_bam_%j.out
+#SBATCH -e sam_sort_bam_%j.err
+#SBATCH --partition=general
+
+export TMPDIR=/home/CAM/aeily/tmp/
+
+module load gffread
+module load stringtie
+
+gffread TAIR10_GFF3_genes.gff -T -o athaliana_TAIR10_genes.gtf
+
+stringtie -p 16 athaliana_root_1.bam -G athaliana_TAIR10_genes.gtf -o athaliana_root_1.gtf
+
+stringtie -p 16 athaliana_root_2.bam -G athaliana_TAIR10_genes.gtf -o athaliana_root_2.gtf
+
+stringtie -p 16 athaliana_shoot_1.bam -G athaliana_TAIR10_genes.gtf -o athaliana_shoot_1.gtf
+
+stringtie -p 16 athaliana_shoot_2.bam -G athaliana_TAIR10_genes.gtf -o athaliana_shoot_2.gtf
+
+stringtie --merge -p 16 -G -o merged stringtie_merged.gtf
+
+stringtie -e -B -p 16 athaliana_root_1.bam -G stringtie_merged.gtf -o ballgown/athaliana_root_1/athaliana_root_1.count
+
+stringtie -e -B -p 16 athaliana_root_2.bam -G stringtie_merged.gtf -o ballgown/athaliana_root_2/athaliana_root_2.count
+
+stringtie -e -B -p 16 athaliana_shoot_1.bam -G stringtie_merged.gtf -o ballgown/athaliana_shoot_1/athaliana_shoot_1.count
+
+stringtie -e -B -p 16 athaliana_shoot_2.bam -G stringtie_merged.gtf -o ballgown/athaliana_shoot_2/athaliana_shoot_2.count
+
+                                                                                             [ Read 36 lines ]
+^G Get Help                       ^O WriteOut                       ^R Read File                      ^Y Prev Page                      ^K Cut Text                       ^C Cur Pos
+^X Exit                           ^J Justify                        ^W Where Is                       ^V Next Page                      ^U UnCut Text                     ^T To Spell
+</pre>
+<br>
+<pre style="color: silver; background: black;">-bash-4.2$ sbatch transcript_assembly.sh</pre>
+
+<h2 id="Sixth_Point_Header">Differential expression analysis using ballgown</h2>
+For many organisms, many of the same genes are expressed in separate cell types, with a variety of phenotype differences a result of the specific isoforms a cell will use. Therefore, when performing a differential expression analysis from different parts of one organism (not one species, but a singular organism), it is wise to perform an isoform expression analysis alongside a standard differential expression analysis and combine the results. We will only be performing the isoform expresion analysis. <a href="https://bioconductor.org/packages/release/bioc/html/ballgown.html">Ballgown</a> is a differential expression package for R via Bioconductor ideal for isoform expression analyses. Before beginning, you need to secure copy our ballgown directory from Xanadu to your local machine:
+
+<pre style="color: silver; background: black;">-bash-4.2$ exit
+logout
+Connection to xanadu-submit-ext.cam.uchc.edu closed.
+user:~$ scp -r YOUR.USER.NAME@xanadu-submit-ext.cam.uchc.edu:/home/CAM/aeily/rnaseq_for_model_plant/ballgown .</pre>
+
+Now we load <a href="https://www.rstudio.com/products/rstudio/download/">RStudio</a> with administrator privileges (otherwise you cannot install packages!).
+
+To begin we must download and load the proper packages:
+
+<pre style="color: silver; background: black;">install.packages("devtools")
+install.packages("RFLPtools")
+source("http://www.bioconductor.org/biocLite.R")
+biocLite(c("alyssafrazee/RSkittleBrewer","ballgown", "genefilter", "dplyr", "devtools"))
+
+library(ballgown)
+library(RSkittleBrewer)
+library(genefilter)
+library(dplyr)
+library(ggplot2)
+library(gplots)
+library(devtools)
+library(RFLPtools)</pre>
+
+Now we need to set our working directory to the directory which contains our "ballgown" folder. For me, this is:
+
+<pre style="color: silver; background: black;">dir <- "C://Users/Wolf/Desktop/"
+setwd(dir)
+list.files()</pre>
+
+You should see the "ballgown" folder after the list.files() command.
+
+Let's have a look at the ballgown function:
+
+<pre style="color: silver; background: black;">help("ballgown")</pre>
+
+<div class="boxed">constructor function for ballgown objects
+
+Description
+
+constructor function for ballgown objects
+
+Usage
+
+ballgown(samples = NULL, dataDir = NULL, samplePattern = NULL,
+  bamfiles = NULL, pData = NULL, verbose = TRUE, meas = "all")
+Arguments
+
+samples	
+vector of file paths to folders containing sample-specific ballgown data (generated by tablemaker). If samples is provided, dataDir and samplePattern are not used.
+dataDir	
+file path to top-level directory containing sample-specific folders with ballgown data in them. Only used if samples is NULL.
+samplePattern	
+regular expression identifying the subdirectories of\ dataDir containing data to be loaded into the ballgown object (and only those subdirectories). Only used if samples is NULL.
+bamfiles	
+optional vector of file paths to read alignment files for each sample. If provided, make sure to sort properly (e.g., in the same order as samples). Default NULL.
+pData	
+optional data.frame with rows corresponding to samples and columns corresponding to phenotypic variables.
+verbose	
+if TRUE, print status messages and timing information as the object is constructed.
+meas	
+character vector containing either "all" or one or more of: "rcount", "ucount", "mrcount", "cov", "cov_sd", "mcov", "mcov_sd", or "FPKM". The resulting ballgown object will only contain the specified expression measurements, for the appropriate features. See vignette for which expression measurements are available for which features. "all" creates the full object.</div>
+
+Because of the structure of our ballgown directory, we may use dataDir = "ballgown", samplePattern = "athaliana", measure = "FPKM", and pData = some_type_of_phenotype_matrix.
+
+We want all of the objects in our arguments to be in the same order as they are present in the ballgown directory. Therefore, we want our pData matrix to have two columns -- the first column being the samples as they appear in the ballgown directory, and the second being the phenotype of each sample in the column before it (root or shoot). Let's see the order of our sample files:
+
+<pre style="color: silver; background: black;">list.files("ballgown/")
+&#35;&#35; [1] "athaliana_root_1"  "athaliana_root_2"  "athaliana_shoot_1" "athaliana_shoot_2"</pre>
+
+Now we construct a 4x2 phenotype matrix with the first column being our samples in order and the second each sample's phenotype:
+
+<pre style="color: silver; background: black;">pheno_data = c("athaliana_root_1", "athaliana_root_2", "athaliana_shoot_1",  "athaliana_shoot_2","root","root","shoot","shoot")
+
+&#35;&#35;R fills the rows of each column first. Therefore, our character vector contains all of column 1 in order, followed by all of column 2 in order. The end result will be our matrix.
+
+pheno_matrix = matrix(pheno_data, ncol=2)
+
+pheno_matrix = as.data.frame(pheno_matrix)
+
+colnames(pheno_matrix) <- c("sample", "part")
+
+rownames(pheno_matrix) <- pheno_matrix[,1]
+
+pheno_matrix
+
+&#35;&#35;                             sample  part
+&#35;&#35;athaliana_root_1   athaliana_root_1  root
+&#35;&#35;athaliana_root_2   athaliana_root_2  root
+&#35;&#35;athaliana_shoot_1 athaliana_shoot_1 shoot
+&#35;&#35;athaliana_shoot_2 athaliana_shoot_2 shoot</pre>
+
+We may now create our ballgown object:
+
+<pre style="color: silver; background: black;">
+bg <- ballgown(dataDir = "ballgown", pData=pheno_matrix, samplePattern = "athaliana")
+&#35;&#35;Wed Jun 13 11:12:33 2018
+&#35;&#35;Wed Jun 13 11:12:33 2018: Reading linking tables
+&#35;&#35;Wed Jun 13 11:12:33 2018: Reading intron data files
+&#35;&#35;Wed Jun 13 11:12:35 2018: Merging intron data
+&#35;&#35;Wed Jun 13 11:12:36 2018: Reading exon data files
+&#35;&#35;Wed Jun 13 11:12:39 2018: Merging exon data
+&#35;&#35;Wed Jun 13 11:12:40 2018: Reading transcript data files
+&#35;&#35;Wed Jun 13 11:12:41 2018: Merging transcript data
+&#35;&#35;Wrapping up the results
+&#35;&#35;Wed Jun 13 11:12:42 2018
+
+&#35;&#35;we filter our ballgown object to take only genes with <a href="https://en.wikipedia.org/wiki/Variance">variances</a> above 1 using <a href="https://www.rdocumentation.org/packages/metaMA/versions/3.1.2/topics/rowVars">rowVars()</a>
+
+??ballgown::subset</pre>
+
+<br>
+
+<div class="boxed">subset ballgown objects to specific samples or genomic locations
+
+Description
+
+subset ballgown objects to specific samples or genomic locations
+
+Usage
+
+subset(x, ...)
+
+## S4 method for signature 'ballgown'
+subset(x, cond, genomesubset = TRUE)
+Arguments
+
+x	
+a ballgown object
+...	
+further arguments to generic subset
+cond	
+Condition on which to subset. See details.
+genomesubset	
+if TRUE, subset x to a specific part of the genome. Otherwise, subset x to only include specific samples. TRUE by default.
+Details
+
+To use subset, you must provide the cond argument as a string representing a logical expression specifying your desired subset. The subset expression can either involve column names of texpr(x, "all") (if genomesubset is TRUE) or of pData(x) (if genomesubset is FALSE). For example, if you wanted a ballgown object for only chromosome 22, you might call subset(x, "chr == 'chr22'"). (Be sure to handle quotes within character strings appropriately).</div>
+
+<pre style="color: silver; background: black;">bg_filt = subset(bg, "rowVars(texpr(bg))>1", genomesubset=TRUE)
+
+&#35;&#35;we follow the guide and subset our ballgown object under the condition that the row-variances of the expression data are greater than one, keeping the gene names.</pre>
+
+To perform the isoform differential expression analysis we use ballgown's "stattest" function. Let's have a look at it:
+<pre style="color: silver; background: black;">??ballgown::stattest</pre>
+
+<div class="boxed">
+  statistical tests for differential expression in ballgown
+
+Description
+
+Test each transcript, gene, exon, or intron in a ballgown object for differential expression, using comparisons of linear models.
+
+Usage
+
+stattest(gown = NULL, gowntable = NULL, pData = NULL, mod = NULL,
+  mod0 = NULL, feature = c("gene", "exon", "intron", "transcript"),
+  meas = c("cov", "FPKM", "rcount", "ucount", "mrcount", "mcov"),
+  timecourse = FALSE, covariate = NULL, adjustvars = NULL, gexpr = NULL,
+  df = 4, getFC = FALSE, libadjust = NULL, log = TRUE)
+Arguments
+
+gown	
+name of an object of class ballgown
+gowntable	
+matrix or matrix-like object with rownames representing feature IDs and columns representing samples, with expression estimates in the cells. Provide the feature name with feature. You must provide exactly one of gown or gowntable. NB: gowntable is log-transformed within stattest if log is TRUE, so provide un-logged expression values in gowntable.
+pData	
+Required if gowntable is provided: data frame giving phenotype data for the samples in the columns of gowntable. (Rows of pData correspond to columns of gowntable). If gown is used instead, it must have a non-null, valid pData slot (and the pData argument to stattest should be left NULL).
+mod	
+object of class model.matrix representing the design matrix for the linear regression model including covariates of interest
+mod0	
+object of class model.matrix representing the design matrix for the linear regression model without the covariates of interest.
+feature	
+the type of genomic feature to be tested for differential expression. If gown is used, must be one of "gene", "transcript", "exon", or "intron". If gowntable is used, this is just used for labeling and can be whatever the rows of gowntable represent.
+meas	
+the expression measurement to use for statistical tests. Must be one of "cov", "FPKM", "rcount", "ucount", "mrcount", or "mcov". Not all expression measurements are available for all features. Leave as default if gowntable is provided.
+timecourse	
+if TRUE, tests whether or not the expression profiles of genomic features vary over time (or another continuous covariate) in the study. Default FALSE. Natural splines are used to fit time profiles, so you must have more timepoints than degrees of freedom used to fit the splines. The default df is 4.
+covariate	
+string representing the name of the covariate of interest for the differential expression tests. Must correspond to the name of a column of pData(gown). If timecourse=TRUE, this should be the study's time variable.
+adjustvars	
+optional vector of strings representing the names of potential confounders. Must correspond to names of columns of pData(gown).
+gexpr	
+optional data frame that is the result of calling gexpr(gown)). (You can speed this function up by pre-creating gexpr(gown).)
+df	
+degrees of freedom used for modeling expression over time with natural cubic splines. Default 4. Only used if timecourse=TRUE.
+getFC	
+if TRUE, also return estimated fold changes (adjusted for library size and confounders) between populations. Only available for 2-group comparisons at the moment. Default FALSE.
+libadjust	
+library-size adjustment to use in linear models. By default, the adjustment is defined as the sum of the sample's log expression measurements below the 75th percentile of those measurements. To use a different library-size adjustment, provide a numeric vector of each sample's adjustment value. Entries of this vector correspond to samples in in rows of pData. If no library size adjustment is desired, set to FALSE.
+log	
+if TRUE, outcome variable in linear models is log(expression+1), otherwise it's expression. Default TRUE.
+</div>
