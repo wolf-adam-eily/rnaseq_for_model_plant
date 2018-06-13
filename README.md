@@ -859,8 +859,9 @@ bg <- ballgown(dataDir = "ballgown", pData=pheno_matrix, samplePattern = "athali
 
 &#35;&#35;we filter our ballgown object to take only genes with <a href="https://en.wikipedia.org/wiki/Variance">variances</a> above 1 using <a href="https://www.rdocumentation.org/packages/metaMA/versions/3.1.2/topics/rowVars">rowVars()</a>
 
-??ballgown::subset
+??ballgown::subset</pre>
 
+<pre>
 <strong style="color: blue;">subset ballgown objects to specific samples or genomic locations</strong>
 
 <strong style="color: grey;">"Description</strong>
@@ -895,7 +896,7 @@ To use subset, you must provide the cond argument as a string representing a log
 To perform the isoform differential expression analysis we use ballgown's "stattest" function. Let's have a look at it:
 <pre style="color: silver; background: black;">??ballgown::stattest</pre>
 
-<strong style="color: blue;">statistical tests for differential expression in ballgown</strong>
+<pre><strong style="color: blue;">statistical tests for differential expression in ballgown</strong>
 
 <strong style="color: grey;">Description</strong>
 
