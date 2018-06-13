@@ -1111,7 +1111,7 @@ plot.new()
 par(mfrow=c(1,1))
 plot(pca[,1],pca[,2] type='n', xlab="", ylab="", main="PCA plot for all libraries")
 points(pca[,1], pca[,2], col="grey", cex=2, pch=16)
-text(pca[,1], pca[,1], short_names, col=c("red", "red", "hotpink", "hotpink")</pre>
+text(pca[,1], pca[,1], short_names, col=c("red", "red", "hotpink", "hotpink"))</pre>
 
 
 <h2 id="Seventh_Point_Header">Topological networking using cytoscape</h2>
