@@ -955,8 +955,148 @@ write.csv(results_genes, "gene_results.csv", row.names=FALSE)
 
 </pre>
 
+Now we want to visualize our data:
+
+<pre style="color: silver; background: black;">&#35;&#35;we want pretty colors for our visualization
+tropical = c('red', 'dodgerblue', 'hotpink', 'limegreen', 'yellow')
+palette(tropical)
+
+&#35;&#35;we want to compare our genes based on their FPKM values. We know from reading ballgown's vignette that we can extract the expression data using texpr() and specifying a measure. 
+
+fpkm = texpr(bg, meas = "FPKM")
+
+&#35;&#35;let's look at the distribution
+
+plot(density(fpkm),main="Density Plot of \nUntransformed FPKM")
+
+&#35;&#35;We can see virtually nothing except that there are many, many genes that are lowly expressed. The reason for the sharp peak is that the density plot automatically scales its x-axis from the lowest expressed to the highest expressed. Let's see what those values are:
+
+min(fpkm)
+&#35;&#35;0
+max(fpkm)
+&#35;&#35;1179157
+
+&#35;&#35;because of this crazy scaling, we cannot truly see the distribution. However, what we <i>can</i> do is to transform the data such that the variance is not so staggering, allowing us to see better. There are a few rules for this, all of the data must be transformed in a consistent and reversible manner, after transformation no data may have a negative value, and all data with a value of 0 must also be 0 after transformation. The reason for the second and third rules is more epistemological. For us, if a gene has an FPKM of 0, then for that sample the gene is unexpressed. Should we transform the data and that particular gene's FPKM is now above 0, we are fundamentally changing the nature of that sample -- i.e., we are now saying it is expresesing a gene it actually is not! Additionally, there is no such thing as negative expression, so there is no physical reality where we will have an FPKM beneath 0. With these three rules, we see that taking the log of all our data will prevent negative values, be consistent and reversible, and scale down our variance. However, log(0) = -inf! We have broken a cardinal rule (oddly enough, the fact that it is infinity is not a rule-breaker, but rather that it is <b>negative</b> infinity! Seeing this, we can simply add 1 to our data before log transforming, log(0+1) = 0. Now we have fulfilled all three rules.
+
+fpkm = log2(fpkm + 1)
+
+plot(density(fpkm),main="Density Plot of \nTransformed Data")
+
+&#35;&#35;now we see an actual distribution. Let's see the difference in distribution between each individual part. To do this we are going to plot the density for each part, one by one, and watch for great changes.
+
+dim(fpkm)
+&#35;&#35;41854     4
+colnames(fpkm)
+&#35;&#35;"FPKM.athaliana_root_1"  "FPKM.athaliana_root_2"  "FPKM.athaliana_shoot_1" "FPKM.athaliana_shoot_2"
+
+plot(density(fpkm[,1]),main="Density Comparison")
+lines(density(fpkm[,2])
+lines(density(fpkm[,3])
+lines(density(fpkm[,4])
+
+&#35;&#35;we see that overall the distributions are pretty similar, but not identical -- shoot 2 has the highest expression levels while root 2 has the lowest.
+
+&#35;&#35;now we will generate a <a href="http://setosa.io/ev/principal-component-analysis/">PCA</a> plot. I strongly advise you read the PCA link before continuing if you are not familiar with Principal Component Analysis. It will not be explained in this tutorial.
+
+&#35;&#35;let's create a vector with our PCA point names
+
+short_names = c("r1","r2","s1","s2")
+
+&#35;&#35;we are going to be using the <a href="https://en.wikipedia.org/wiki/Pearson_correlation_coefficient>Pearson coefficient</a> for our PCA plot. You may think of the Pearson coefficient simply as a measure of similarity. If two datasets are very similar, they will have a Pearson coefficient approaching 1 (every data compared to itself has a Pearson coefficient of 1). If two datasets are very dissimilar, they will have a Pearson coefficient approaching 0 Let's calculate a vector containing the correlation coefficient
+	
+r = cor(fpkm, use="pairwise.complete.obs", method="pearson")
+
+&#35;&#35;the cor() function takes our expression matrix, as well as two other arguments. the "pairwise.complete.obs" argument tells R that we want to do a pairwise analysis (so compare column 1 to 2, 3, and 4, then column 2 to 3 and 4, and lastly column 3 to 4) only on observations (genes) without missing values. Lastly, our method "pearson" tells us we're using the Pearson method as a similarity metric. Let's have a look at r
+
+r
+
+<strong style="color:blue;">				FPKM.athaliana_root_1 FPKM.athaliana_root_2 FPKM.athaliana_shoot_1 FPKM.athaliana_shoot_2
+FPKM.athaliana_root_1              1.0000000             0.9127575              0.7254296		0.7639201
+FPKM.athaliana_root_2              0.9127575             1.0000000              0.7247305		0.7661130
+FPKM.athaliana_shoot_1             0.7254296             0.7247305              1.0000000		0.8877891
+FPKM.athaliana_shoot_2             0.7639201             0.7661130              0.8877891		1.0000000</strong>
+
+&#35;&#35;here we see each member of the diagonal is 1.000000. Of course we knew this already, as each member is 100% similar to itself! Then we have the similarity measures of each sample to each other sample.
+
+&#35;&#35;rather than calculate the similarity, it would be nicer to calculate the dissimilarity or distance between each sample. We know that if two samples are the same, their similarity measure is 1.000000. We also know that then their dissimilarity is 0%, or 0.000000. Here we see that if we subtract each element from 1, we get the dissimilarity matrix! Let's do it:
+
+d = 1 - r
+
+d
+<strong style="color:blue;">
+                       FPKM.athaliana_root_1 FPKM.athaliana_root_2 FPKM.athaliana_shoot_1 FPKM.athaliana_shoot_2
+FPKM.athaliana_root_1             0.00000000            0.08724246              0.2745704	0.2360799
+FPKM.athaliana_root_2             0.08724246            0.00000000              0.2752695	0.2338870
+FPKM.athaliana_shoot_1            0.27457045            0.27526946              0.0000000	0.1122109
+FPKM.athaliana_shoot_2            0.23607994            0.23388696              0.1122109	0.0000000
+</strong>
+&#35;&#35;R has a function which will perform the principal component analysis for us when provided with a dissimilarity matrix, cmdscale. Let's have a look at it:
+
+help(cmdscale)</pre>
+
+<pre style="color: silver; background: black;"><strong style="color: blue;">Classical (Metric) Multidimensional Scaling</strong>
+
+<strong style="color: grey;">e="Description</strong>
+
+<em style="color: green;">Classical multidimensional scaling (MDS) of a data matrix. Also known as principal coordinates analysis (Gower, 1966).</em>
+
+<strong style="color: grey;">Usage</strong>
+
+cmdscale(d, k = 2, eig = FALSE, add = FALSE, x.ret = FALSE,
+         list. = eig || add || x.ret)
+<strong style=color: green;">Arguments</strong>
+
+d	a distance structure such as that returned by dist or a full symmetric matrix containing the dissimilarities.
+k	the maximum dimension of the space which the data are to be represented in; must be in {1, 2, …, n-1}.
+eig	indicates whether eigenvalues should be returned.
+add	logical indicating if an additive constant c* should be computed, and added to the non-diagonal dissimilarities such that the 
+	modified dissimilarities are Euclidean.
+x.ret	indicates whether the doubly centred symmetric distance matrix should be returned.
+list.	logical indicating if a list should be returned or just the n * k matrix, see ‘Value:’.
+
+<strong style="color:grey;">Details</strong>
+
+Multidimensional scaling takes a set of dissimilarities and returns a set of points such that the distances between the points are approximately equal to the dissimilarities. (It is a major part of what ecologists call ‘ordination’.)
+
+A set of Euclidean distances on n points can be represented exactly in at most n - 1 dimensions. cmdscale follows the analysis of Mardia (1978), and returns the best-fitting k-dimensional representation, where k may be less than the argument k.
+
+The representation is only determined up to location (cmdscale takes the column means of the configuration to be at the origin), rotations and reflections. The configuration returned is given in principal-component axes, so the reflection chosen may differ between R platforms (see prcomp).
+
+When add = TRUE, a minimal additive constant c* is computed such that the dissimilarities d[i,j] + c* are Euclidean and hence can be represented in n - 1 dimensions. Whereas S (Becker et al, 1988) computes this constant using an approximation suggested by Torgerson, R uses the analytical solution of Cailliez (1983), see also Cox and Cox (2001). Note that because of numerical errors the computed eigenvalues need not all be non-negative, and even theoretically the representation could be in fewer than n - 1 dimensions.</pre>
+
+Let's perform our principal component analysis:
+
+<pre style="color: silver; background: black;">pca = cmdscale(d, k=2)
+
+&#35;&#35;so we expect pca to have four rows, each row corresponding to a sample, and two columns, the first column representing our first coordinate axis and the second dimension representing our second coordinate axis. If we plot the first column against the second column, the distances between points is the dissimilarity between points.
+
+pca
+
+<strong style="color:blue;">			[,1]         [,2]
+FPKM.athaliana_root_1  -0.1229438 -0.016069664
+FPKM.athaliana_root_2  -0.1225334  0.006751752
+FPKM.athaliana_shoot_1  0.1454597 -0.045779068
+FPKM.athaliana_shoot_2  0.1000175  0.055096980</strong>
+
+&#35;&#35;for this next step it is assumed that you are familiar with plotting in R. If not you may look <a href="https://bioinformatics.uconn.edu/introduction-to-r/">here</a>
+
+plot.new()
+par(mfrow=c(1,1))
+plot(pca$points, type='n', xlab="", ylab="", main="PCA plot for all libraries")
+points(pca[,1], pca[,2], col="grey", cex=2, pch=16)
+text(pca[,1], pca[,1], short_names, col=c("red", "red", "hotpink", "hotpink")
+
+
 <h2 id="Seventh_Point_Header">Topological networking using cytoscape</h2>
 
 <a href="https://github.com/miriamposner/cytoscape_tutorials">Cytoscape</a> is a desktop program which creates visual topological networks of data. The only requirement to create a topological network in Cytospace is to have an "edge list". An edge list is a two-column list which comprises two separate types of data. Each row of the edge list is a single piece of information (so both columns combine to form a piece of infromation for the row) that Cytospace uses. Now, let's go over the two columns of an edge list:
 
-The two columns of an edge list represent the "sources" and "nodes" 
+The two columns of an edge list represent the "sources" and "nodes". You may instead think of the two columns representing an object and its group. For instance, the edge list:
+
+<pre style="color: silver; background: black;">A	1
+	B	1
+	C	4
+	D	3
+	A	4
+	C	3</pre>
+Means that object A is in both groups 1 and 4, object B is in only group 1, object C is in groups 3 and 4, and so forth. We could then say that our sources are the objects, and our nodes are the groups to which each object belongs. To make our topological network we simply put one point for each object and one point for each group on a piece of paper and draw arrows going from each object-point to each group-point. If two objects are pointing to the same group, we place those objects closer to the group. If an object is part of two or more groups, that object will have two or more arrows pointing to each distinct group to which it belong. The cardinal rule is that no object may have two arrows pointing to the same group (that is, the set for that group is pairwise disjoint). Now we need to begin thinking about our differential expression data.
