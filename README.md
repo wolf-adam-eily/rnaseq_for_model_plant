@@ -1059,7 +1059,7 @@ R has a function which will perform the principal component analysis for us when
 <pre style="color: silver; background: black;">
 help(cmdscale)</pre>
 
-<pre style="color: silver; background: black;"><strong style="color: blue;">Classical (Metric) Multidimensional Scaling</strong>
+<pre style="color: silver; background: black;"><strong>Classical (Metric) Multidimensional Scaling</strong>
 
 <strong style="color: grey;">e="Description</strong>
 
