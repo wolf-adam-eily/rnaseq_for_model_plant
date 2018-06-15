@@ -1301,7 +1301,7 @@ A-ha. We see the mismatch in dimension length is due to some genes having differ
 [225] "AT1G19010" "AT1G19010" "AT1G52400" "AT1G52400" "AT1G52400" "AT5G10110" "AT1G63360" "AT1G63360"
 [233] "AT3G51870"</strong></pre>
 
-Not a single one of the "MSTRG" sequences has been annotated. It is time we address what the "MSTRG" sequences are. You may found out by reading <a href="https://github.com/gpertea/stringtie/issues/95">this</a> FAQ. Please read the link to understand why we cannot use the "MSTRG" sequences in the differential expression analysis, and why it is no worry that they do not appear in our annotations. In actuality, because each MSTRG represents the isoform of a specific gene, but its ID is different across samples, we would expect <i>all</i> of the MSTRG isoforms to come up as differentially expressed, as the computer cannot find one in any of the other samples! The MSTRG tags are ideal for identifying the isoformic expression of a single sample, but because of this cannot be used across samples. You may be wondering, well, why did we go through all of the trouble of assembling our isoformic transcripts? The answer is that by using StringTie we have quantified the amount of <i>complete</i> transcripts matched to a reference gene. Although weird, some assembled isoforms may actually map to one gene while its individual reads may have mapped to two or more! Therefore, while our "MSTRG" sequences are useless in the differential expression analysis, we may have more confidence that our actual gene counts are accurate (which is why this process should be used with highly similar samples, i.e., samples from different parts of one organism). 
+Not a single one of the "MSTRG" sequences has been annotated. It is time we address what the "MSTRG" sequences are. You may find out by reading <a href="https://github.com/gpertea/stringtie/issues/95">this</a> FAQ. Please read the link to understand why we <i>typically</i> cannot use the "MSTRG" sequences in the differential expression analysis, and most certainly not in annotations. In actuality, because each MSTRG represents the isoform of a specific gene, but its ID is different across samples, we would expect <i>all</i> of the MSTRG isoforms to come up as differentially expressed, as the computer cannot find one in any of the other samples! We avoid this by running StringTie's "-eb" options to map all of our assembled transcript reads back to the alignment GTF we created, thereby ensuring that all of our final alignment MSTRG ids match. We do not care about the MSTRG in annotation because the names are randomized! Our assembled transcript reads in each sample are actually <i>complete</i> transcripts, which are then matched to our assembled reference genome. Although weird, some assembled isoforms may actually map to one gene while its individual reads may have mapped to two or more! Therefore, we know that through our procedure forcing consistent nomenclature, we have more confidence that our actual gene counts and differential expression analyses are more robust (which is why this process should be used with highly similar samples, i.e., samples from different parts of one organism), even if we cannot use that information in our annotations.
 
 Lastly, let's remove the MSTRG sequences from our gene results object and write our files:
 
@@ -1309,7 +1309,7 @@ Lastly, let's remove the MSTRG sequences from our gene results object and write 
 results_genes = subset(results_genes, id %in% annotated_genes$ensembl_gene_id)
 dim(results_genes)
 <strong> 116 5</strong>
-head(results_genes)</pre>
+head(results_genes)
 <strong>feature        id         fc         pval      qval
 2     gene AT4G14220 21.0384627 0.0001882308 0.5184498
 7     gene AT5G13680  0.0410302 0.0003455516 0.5184498
@@ -1317,6 +1317,7 @@ head(results_genes)</pre>
 10    gene AT5G15570  7.1289982 0.0004775700 0.5184498
 11    gene AT4G09150  0.3713041 0.0005426543 0.5184498
 12    gene AT2G39890 28.5590198 0.0005462862 0.5184498</strong>
+write.csv(file="results_genes.csv",results_genes,row.names=F)</pre>
 
 Now we want to visualize our data:
 
