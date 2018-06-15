@@ -879,16 +879,16 @@ We may now create our ballgown object:
 
 <pre style="color: silver; background: black;">
 bg <- ballgown(dataDir = "ballgown", pData=pheno_matrix, samplePattern = "athaliana")
-&#35;&#35;Wed Jun 13 11:12:33 2018
-&#35;&#35;Wed Jun 13 11:12:33 2018: Reading linking tables
-&#35;&#35;Wed Jun 13 11:12:33 2018: Reading intron data files
-&#35;&#35;Wed Jun 13 11:12:35 2018: Merging intron data
-&#35;&#35;Wed Jun 13 11:12:36 2018: Reading exon data files
-&#35;&#35;Wed Jun 13 11:12:39 2018: Merging exon data
-&#35;&#35;Wed Jun 13 11:12:40 2018: Reading transcript data files
-&#35;&#35;Wed Jun 13 11:12:41 2018: Merging transcript data
-&#35;&#35;Wrapping up the results
-&#35;&#35;Wed Jun 13 11:12:42 2018
+<strong>Wed Jun 13 11:12:33 2018
+Wed Jun 13 11:12:33 2018: Reading linking tables
+Wed Jun 13 11:12:33 2018: Reading intron data files
+Wed Jun 13 11:12:35 2018: Merging intron data
+Wed Jun 13 11:12:36 2018: Reading exon data files
+Wed Jun 13 11:12:39 2018: Merging exon data
+Wed Jun 13 11:12:40 2018: Reading transcript data files
+Wed Jun 13 11:12:41 2018: Merging transcript data
+Wrapping up the results
+Wed Jun 13 11:12:42 2018</strong>
 </pre>
 We filter our ballgown object to take only genes with <a href="https://en.wikipedia.org/wiki/Variance">variances</a> above 1 
 using <a href="https://www.rdocumentation.org/packages/metaMA/versions/3.1.2/topics/rowVars">rowVars()</a>.
@@ -937,7 +937,7 @@ To perform the isoform differential expression analysis we use ballgown's "statt
 <strong style="color: grey;">Description</strong>
 
 <em style="color: green;">Test each transcript, gene, exon, or intron in a ballgown object for differential expression, using
-&#35;&#35;comparisons of linear models.</em>
+comparisons of linear models.</em>
 
 <strong style="color: grey;">Usage</strong>
 
