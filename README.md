@@ -1180,7 +1180,7 @@ head(thale_cress_data_frame)
 3       AT5G24735                       other RNA [Source:TAIR;Acc:AT5G24735]
 4       AT2G45780                       other RNA [Source:TAIR;Acc:AT2G45780]
 5       AT2G42425                    Unknown gene [Source:TAIR;Acc:AT2G42425]
-6       AT4G01533                       other RNA [Source:TAIR;Acc:AT4G01533]</strong>
+6       AT4G01533                       other RNA [Source:TAIR;Acc:AT4G01533]</pre></strong>
 
 The default descriptions are certainly underwhelming. Let's see if there are any other types of descriptions we can get:
 
