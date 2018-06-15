@@ -1321,12 +1321,12 @@ Not a single one of the "MSTRG" sequences has been annotated. It is time we addr
 Lastly, let's remove the MSTRG sequences from our gene results object and write our files:
 
 <pre style="color: silver; background: black;">write.csv(file="annotated_genes.csv",annotated_genes,row.names=F)
-results_genes = subset(results_genes, id %in% annotated_genes$ensembl_gene_id)
+results_genes_without_MSTRG = subset(results_genes, id %in% annotated_genes$ensembl_gene_id)
 
-dim(results_genes)
+dim(results_genes_without_MSTRG)
 <strong> 116 5</strong>
 
-head(results_genes)
+head(results_genes_without_MSTRG)
 <strong>feature        id         fc         pval      qval
 2     gene AT4G14220 21.0384627 0.0001882308 0.5184498
 7     gene AT5G13680  0.0410302 0.0003455516 0.5184498
@@ -1335,7 +1335,7 @@ head(results_genes)
 11    gene AT4G09150  0.3713041 0.0005426543 0.5184498
 12    gene AT2G39890 28.5590198 0.0005462862 0.5184498</strong>
 
-write.csv(file="results_genes.csv",results_genes,row.names=F)</pre>
+write.csv(file="results_genes_without_MSTRG.csv",results_genes_without_MSTRG,row.names=F)</pre>
 
 Now we want to visualize our data:
 
