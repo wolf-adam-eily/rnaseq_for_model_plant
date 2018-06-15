@@ -1170,16 +1170,17 @@ head(listAttributes(thale_cress_mart))
 4       ensembl_exon_id           Exon stable ID feature_page
 5           description         Gene description feature_page
 6       chromosome_name Chromosome/scaffold name feature_page</strong>
-##we don't know the chromosome name, so we can just take attributes 1-5
-thale_cress_data_frame = getBM(attributes=c("ensembl_gene_id","ensembl_transcript_id","ensembl_peptide_id","ensembl_exon_id","description"),mart=thale_cress_mart)
+##we don't know the chromosome name, so we can just take attributes 1,3, and 5
+thale_cress_data_frame = getBM(attributes=c("ensembl_gene_id","ensembl_peptide_id","description"),mart=thale_cress_mart)
 head(thale_cress_data_frame)
-<strong>  ensembl_gene_id ensembl_transcript_id ensembl_peptide_id   ensembl_exon_id	description
-1       AT3G11415           AT3G11415.1                    AT3G11415.1.exon1	other RNA
-2       AT1G31258           AT1G31258.1                    AT1G31258.1.exon1	other RNA
-3       AT1G31258           AT1G31258.1                    AT1G31258.1.exon2	other RNA
-4       AT5G24735           AT5G24735.1                    AT5G24735.1.exon1	other RNA
-5       AT5G24735           AT5G24735.1                    AT5G24735.1.exon2	other RNA
-6       AT2G45780           AT2G45780.1                    AT2G45780.1.exon1	other RNA</strong></pre>
+<strong>
+  ensembl_gene_id ensembl_peptide_id                              description
+1       AT3G11415                                                            
+2       AT1G31258                       other RNA [Source:TAIR;Acc:AT1G31258]
+3       AT5G24735                       other RNA [Source:TAIR;Acc:AT5G24735]
+4       AT2G45780                       other RNA [Source:TAIR;Acc:AT2G45780]
+5       AT2G42425                    Unknown gene [Source:TAIR;Acc:AT2G42425]
+6       AT4G01533                       other RNA [Source:TAIR;Acc:AT4G01533]</strong>
 
 The default descriptions are certainly underwhelming. Let's see if there are any other types of descriptions we can get:
 
@@ -1195,8 +1196,127 @@ The default descriptions are certainly underwhelming. Let's see if there are any
 1042         source_description Variant source description          snp
 1080                description           Gene description    sequences</strong></pre>
 
-Finding the other descriptions will take much, much longer. For this tutorial we will be sticking with our un-impressive descriptions. However, you may choose the description best for you and your resesarch.
+Using the other descriptions will take much, much longer as the information is extracted from the appropriate databases via internet connection. For this tutorial we will be sticking with our un-impressive descriptions. However, you may choose the description best for you and your resesarch. Before we move on to annotating, let's have a look at the filters:
 
+<pre style="color: silver; background: black;">head(listFilters(thale_cress_mart))
+<strong>                name                            description
+1    chromosome_name               Chromosome/scaffold name
+2              start                                  Start
+3                end                                    End
+4             strand                                 Strand
+5 chromosomal_region e.g. 1:100:10000:-1, 1:100000:200000:1
+6        with_chembl                      With ChEMBL ID(s)</strong></pre>
+
+Should we only want to annotate genes from a specific chromosome or any other critera, we would use the "filter" argument in getBM to select only the subset of the genome we desire. We now have all of the pieces required for us to annotate our results. Let's have a look at our gene results object and our thale cress data frame one more time:
+<pre style="color: silver; background: black;">head(thale_cress_data_frame)
+<strong>  ensembl_gene_id ensembl_peptide_id                              description
+1       AT3G11415                                                            
+2       AT1G31258                       other RNA [Source:TAIR;Acc:AT1G31258]
+3       AT5G24735                       other RNA [Source:TAIR;Acc:AT5G24735]
+4       AT2G45780                       other RNA [Source:TAIR;Acc:AT2G45780]
+5       AT2G42425                    Unknown gene [Source:TAIR;Acc:AT2G42425]
+6       AT4G01533                       other RNA [Source:TAIR;Acc:AT4G01533]</strong>
+head(gene_results)
+<strong> feature         id           fc         pval      qval
+1    gene MSTRG.4142 2.075827e-01 0.0000491845 0.5184498
+2    gene  AT4G14220 2.103846e+01 0.0001882308 0.5184498
+3    gene MSTRG.3788 5.031936e-03 0.0002087393 0.5184498
+4    gene MSTRG.5824 2.867578e-03 0.0002187155 0.5184498
+5    gene  MSTRG.568 3.186395e-01 0.0002764999 0.5184498
+6    gene  MSTRG.811 3.236509e-04 0.0003448702 0.5184498</strong></pre>
+
+Funny enough, we do not actually use a biomaRt function to annotate our genes! We can simply subset the thale cress data frame to consist of only rows whose ensemble_gene_id matches our gene_results id. Let's give it a try:
+<pre style="color: silver; background: black;">annotated_genes = subset(thale_cress_data_frame, ensembl_gene_id %in% gene_results$id)
+head(annotated_genes)
+<strong>     ensembl_gene_id ensembl_peptide_id                                            description
+340        AT2G07754                                      pre-tRNA [Source:TAIR;Acc:AT2G07754]
+5348       AT1G79830        AT1G79830.1 Golgin Putative 5 [Source:UniProtKB/TrEMBL;Acc:F4HQB9]
+5349       AT1G79830        AT1G79830.3 Golgin Putative 5 [Source:UniProtKB/TrEMBL;Acc:F4HQB9]
+5350       AT1G79830        AT1G79830.2 Golgin Putative 5 [Source:UniProtKB/TrEMBL;Acc:F4HQB9]
+5351       AT1G79830        AT1G79830.4 Golgin Putative 5 [Source:UniProtKB/TrEMBL;Acc:F4HQB9]
+5352       AT1G79830        AT1G79830.5 Golgin Putative 5 [Source:UniProtKB/TrEMBL;Acc:F4HQB9]</strong>
+##let's check our dimensions to ensure every gene was annotated
+
+dim(gene_results)
+<strong>[1] 216   5</strong>
+dim(annotated_genes)
+<strong>[1] 233   3</strong>
+##our dimensions do not match! Let's investigate:
+head(annotated_genes)
+<strong>     ensembl_gene_id ensembl_peptide_id                                            description
+340        AT2G07754                                      pre-tRNA [Source:TAIR;Acc:AT2G07754]
+5348       AT1G79830        AT1G79830.1 Golgin Putative 5 [Source:UniProtKB/TrEMBL;Acc:F4HQB9]
+5349       AT1G79830        AT1G79830.3 Golgin Putative 5 [Source:UniProtKB/TrEMBL;Acc:F4HQB9]
+5350       AT1G79830        AT1G79830.2 Golgin Putative 5 [Source:UniProtKB/TrEMBL;Acc:F4HQB9]
+5351       AT1G79830        AT1G79830.4 Golgin Putative 5 [Source:UniProtKB/TrEMBL;Acc:F4HQB9]
+5352       AT1G79830        AT1G79830.5 Golgin Putative 5 [Source:UniProtKB/TrEMBL;Acc:F4HQB9]</strong>
+
+tail(annotated_genes)
+<strong>      ensembl_gene_id ensembl_peptide_id
+52741       AT1G52400        AT1G52400.1
+52742       AT1G52400        AT1G52400.2
+52861       AT5G10110        AT5G10110.1
+53166       AT1G63360        AT1G63360.2
+53167       AT1G63360        AT1G63360.1
+53521       AT3G51870        AT3G51870.1
+                                                                                            description
+52741         Beta-D-glucopyranosyl abscisate beta-glucosidase [Source:UniProtKB/Swiss-Prot;Acc:Q9SE50]
+52742         Beta-D-glucopyranosyl abscisate beta-glucosidase [Source:UniProtKB/Swiss-Prot;Acc:Q9SE50]
+52861                     DNA-directed RNA polymerase subunit beta [Source:UniProtKB/TrEMBL;Acc:Q8VZV8]
+53166            Probable disease resistance protein At1g63360 [Source:UniProtKB/Swiss-Prot;Acc:Q9SH22]
+53167            Probable disease resistance protein At1g63360 [Source:UniProtKB/Swiss-Prot;Acc:Q9SH22]
+53521 Probable envelope ADP,ATP carrier protein, chloroplastic [Source:UniProtKB/Swiss-Prot;Acc:O65023]</strong></pre>
+
+A-ha. We see the mismatch in dimension length is due to some genes having different isoforms and therefore different peptide ids. Because we matched our data frames by gene id, some of the genes we have extracted multiple peptides! Also, take notice of this:
+
+<pre style="color: silver; background: black;">annotated_genes$ensembl_gene_id
+<strong>  [1] "AT2G07754" "AT1G79830" "AT1G79830" "AT1G79830" "AT1G79830" "AT1G79830" "AT3G01340" "AT3G01340"
+  [9] "AT5G16110" "AT5G42680" "AT5G42680" "AT4G38160" "AT4G38160" "AT4G38160" "AT4G38160" "AT1G49380"
+ [17] "AT4G24290" "AT4G24290" "AT4G24290" "AT4G25320" "AT2G22430" "AT4G14220" "AT2G17760" "AT3G20290"
+ [25] "AT3G20290" "AT3G20290" "AT2G29360" "AT1G74560" "AT1G74560" "AT4G09150" "AT4G09150" "AT5G49840"
+ [33] "AT5G49840" "AT5G49840" "AT5G49840" "AT1G29990" "AT5G65660" "AT1G70000" "AT1G70000" "AT4G18780"
+ [41] "AT5G47490" "AT5G47490" "AT5G47490" "AT1G54080" "AT1G54080" "AT3G43740" "AT3G43740" "AT4G26900"
+ [49] "AT5G53470" "AT1G61800" "AT1G61800" "AT5G27330" "AT3G20890" "AT3G20890" "AT5G10020" "AT5G10020"
+ [57] "AT5G54830" "AT3G17430" "AT3G17430" "AT2G43970" "AT2G43970" "AT4G25960" "AT4G30990" "AT4G30990"
+ [65] "AT4G30990" "AT1G60010" "AT5G45350" "AT5G45350" "AT5G45350" "AT5G45350" "AT5G45350" "AT5G45350"
+ [73] "AT5G45350" "AT5G04510" "AT5G04510" "AT5G04510" "AT3G25430" "AT3G25430" "AT1G32210" "AT1G32210"
+ [81] "AT3G58140" "AT5G58540" "AT5G58540" "AT5G58540" "AT2G22230" "AT3G46280" "AT5G45410" "AT5G45410"
+ [89] "AT5G45410" "AT5G45410" "AT5G45410" "AT4G16695" "AT4G16695" "AT4G16695" "AT4G16695" "AT4G16695"
+ [97] "AT1G20190" "AT1G20190" "AT1G23760" "AT5G09660" "AT5G09660" "AT5G09660" "AT5G09660" "AT5G09660"
+[105] "AT4G32760" "AT4G32760" "AT4G32760" "AT4G21460" "AT4G21460" "AT3G51740" "AT3G62930" "AT4G30080"
+[113] "AT2G41440" "AT2G41440" "AT2G41440" "AT2G41440" "AT1G06700" "AT1G06700" "AT1G06700" "AT4G06676"
+[121] "AT4G06676" "AT1G54920" "AT1G54920" "AT1G54920" "AT1G54920" "AT1G51710" "AT1G51710" "AT5G55790"
+[129] "AT5G55790" "AT5G55790" "AT5G03670" "AT5G03670" "AT5G48380" "AT3G32930" "AT3G32930" "AT5G18480"
+[137] "AT3G47290" "AT3G47290" "AT1G32100" "AT5G08420" "AT2G17530" "AT2G17530" "AT2G17530" "AT4G34000"
+[145] "AT4G34000" "AT4G34000" "AT4G34000" "AT3G48860" "AT3G48860" "AT3G48860" "AT5G18670" "AT1G65730"
+[153] "AT1G63770" "AT1G63770" "AT1G63770" "AT1G63770" "AT1G63770" "AT1G63770" "AT1G63770" "AT2G39890"
+[161] "AT2G39890" "AT2G39890" "AT4G10120" "AT4G10120" "AT4G10120" "AT4G10120" "AT4G10120" "AT4G36750"
+[169] "AT2G20670" "AT2G42620" "AT2G01735" "AT2G01735" "AT2G26340" "AT2G26340" "AT1G27020" "AT5G13680"
+[177] "AT3G27320" "AT3G27320" "AT1G24880" "AT1G24880" "AT5G62920" "AT4G17650" "AT1G64330" "AT5G63380"
+[185] "AT5G39670" "AT4G08510" "AT4G08510" "AT2G41960" "AT3G11030" "AT4G30100" "AT4G30100" "AT5G56290"
+[193] "AT3G57220" "AT3G09560" "AT3G09560" "AT3G09560" "AT3G09560" "AT5G57710" "AT5G25540" "AT5G25540"
+[201] "AT5G25540" "AT1G03080" "AT1G03080" "AT1G03080" "AT5G35690" "AT3G53510" "AT5G10240" "AT5G10240"
+[209] "AT5G16800" "AT5G16800" "AT5G16800" "AT5G13370" "AT1G01440" "AT5G16390" "AT5G16390" "AT5G63940"
+[217] "AT2G46520" "AT1G26740" "AT5G15570" "AT3G51150" "AT3G51150" "AT3G51150" "AT3G51150" "AT3G51150"
+[225] "AT1G19010" "AT1G19010" "AT1G52400" "AT1G52400" "AT1G52400" "AT5G10110" "AT1G63360" "AT1G63360"
+[233] "AT3G51870"</strong></pre>
+
+Not a single one of the "MSTRG" sequences has been annotated. It is time we address what the "MSTRG" sequences are. You may found out by reading <a href="https://github.com/gpertea/stringtie/issues/95">this</a> FAQ. Please read the link to understand why we cannot use the "MSTRG" sequences in the differential expression analysis, and why it is no worry that they do not appear in our annotations. In actuality, because each MSTRG represents the isoform of a specific gene, but its ID is different across samples, we would expect <i>all</i> of the MSTRG isoforms to come up as differentially expressed, as the computer cannot find one in any of the other samples! The MSTRG tags are ideal for identifying the isoformic expression of a single sample, but because of this cannot be used across samples. You may be wondering, well, why did we go through all of the trouble of assembling our isoformic transcripts? The answer is that by using StringTie we have quantified the amount of <i>complete</i> transcripts matched to a reference gene. Although weird, some assembled isoforms may actually map to one gene while its individual reads may have mapped to two or more! Therefore, while our "MSTRG" sequences are useless in the differential expression analysis, we may have more confidence that our actual gene counts are accurate (which is why this process should be used with highly similar samples, i.e., samples from different parts of one organism). 
+
+Lastly, let's remove the MSTRG sequences from our gene results object and write our files:
+
+<pre style="color: silver; background: black;">write.csv(file="annotated_genes.csv",annotated_genes,row.names=F)
+gene_results = subset(gene_results, id %in% annotated_genes$ensembl_gene_id)
+dim(gene_results)
+<strong> 116 5</strong>
+head(gene_results)</pre>
+<strong>feature        id         fc         pval      qval
+2     gene AT4G14220 21.0384627 0.0001882308 0.5184498
+7     gene AT5G13680  0.0410302 0.0003455516 0.5184498
+8     gene AT3G51870 19.8788224 0.0003618771 0.5184498
+10    gene AT5G15570  7.1289982 0.0004775700 0.5184498
+11    gene AT4G09150  0.3713041 0.0005426543 0.5184498
+12    gene AT2G39890 28.5590198 0.0005462862 0.5184498</strong>
 
 Now we want to visualize our data:
 
