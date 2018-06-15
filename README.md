@@ -37,18 +37,18 @@ The workflow may be cloned into the appropriate directory using the terminal com
 -bash-4.2$ ls<
 -bash-4.2$ cd rnaseq_for_model_plant/
 -bash-4.2$ ls
-<strong>all_clusters.csv.png        README.md
-complete_edge_list.csv.png  sam_sort_bam.sh
-cytoscape1.png              sickle_run.sh
-cytoscape2.png              transcript_assembly.sh
-cytoscape3.png              trimmed.html
-cytoscape4.png              trimmed_SRR3498212_fastqc.html
-cytoscape5.png              trimmed_SRR3498213_fastqc.html
-data_dump.sh                trimmed_SRR3498215_fastqc.html
-hisat2_run.sh               trimmed_SRR3498216_fastqc.html
-pcaplot_for_all_libraries.png
-Rplot.png
-quality_control.sh</strong>
+<strong>all_clusters.csv.png           README.md
+complete_edge_list.csv.png     Rplot.png
+cytoscape1.png                 sam_sort_bam.sh
+cytoscape2.png                 sickle_run.sh
+cytoscape3.png                 transcript_assembly.sh
+cytoscape4.png                 trimmed.html
+cytoscape5.png                 trimmed_SRR3498212_fastqc.html
+data_dump.sh                   trimmed_SRR3498213_fastqc.html
+hisat2_run.sh                  trimmed_SRR3498215_fastqc.html
+pcaplot_for_all_libraries.png  trimmed_SRR3498216_fastqc.html
+quality_control.sh
+</strong>
 </pre>
 
 All of the completed scripts for this tutorial are available for you to submit. However, before submitting, you may want to edit the scripts to include your email!
