@@ -1177,7 +1177,7 @@ Do not worry that there are no names in this output! dist() has kept track of th
 	
 <pre style="color: silver; background: black;">clusters = hclust(dist_diffexp_genes)</pre>
 
-The output of head(clusters) is much to large to include here. However, we can plot our dendrogram quite easily:
+The output of head(clusters) is much too large to include here. However, we can plot our dendrogram quite easily:
 
 <pre style="color: silver; background: black;">plot(clusters)</pre>
 If you squint you can estimate how many groups is suitable with which to start. I count 12. We can group our dendogram into its twelve most clostly related parts using the function rect.hclust(). 
@@ -1233,15 +1233,15 @@ write.csv(clusters_of_3_csv, file="clusters_of_3.csv", row.names=F)</pre>
 Now that we have our clusters, we are going to need to combine all of them into one edge list. This seems easy, but keep in mind that if we copy and paste them as is we have three group 1s, 2s, and 3s, which each are actually a different group! Let's start with the clusters of 3. We know that in our largest we have groups 1-12. So for each group in clusters of 3 we must transform them such that they are not any number 1 - 12. The easiest way to do this is to multiply each by 13, which will give us 13, 26, 39 as our new groups. Those are not present in any other clustering, so we maintain that they are all unique groups across files. In Excel simply multiply the entire column by 13 in the clusters of 3 file. Now we repeat for the clusters of 6, multiplying each group instead by 14. Our groups are now 1-12, 13, 26, 39, 14, 28, 42, 56, 70, 80. No overlap! Lastly we simply copy clusters of 6 and paste it beneath clusters of 3, followed by copying clusters of 12 and pasting those beneath the other two. Lastly, save your file and you are ready to use Cytoscape!
 
 First, load Cytospace and you will be greeted with a screen like this:
-
+<img src="cytoscape1.png">
 Click this icon:
-
+<img src="cytoscape2.png">
 
 and load your data. Your screen should now look like:
-
+<img src="cytoscape3.png">
 
 Cytospace does not know which are the sources and which are the nodes. We know that our genes are our sources flowing into our nodes. Therefore, we click on sample and the following window should appear:
-
+<img src="cytoscape4.png">
 Click on "Source node".
 
 Now click on "Cluster" and then "Target node".
@@ -1249,8 +1249,9 @@ Now click on "Cluster" and then "Target node".
 Lastly, hit OK to import your data. 
 
 Currently our data is not in a very presentable format. Let's go over to the Style button and click the box which says "default". Click on "curved". Then click on Layout and choose "circular layout". The end result should be this:
+<img src="all_clusters.csv.png">
 
-You can play around without as you like, my final result looked like this:
+Play around and familiarize yourself with Cytoscape. It is a very handy tool!
 
 We see we have one large central network which connects to two small networks. Lastly, we have a peripheral network which seems to be distinct. There simply is too much going on here for us to extract much meaningful information. Let's pare down our information. Instead of creating a network based on genes, let's instead create a network based on the groups. That is, should a gene appear in three distinct groups, 1, 2, 3, we could create a network simply with the nodes 1, 2, 3. We have approximately 200 genes, but only 21 groups! We know all the groups to which each gene belongs, so no information will be lost. Let's combine all of our groupings from the clusters of 3, 6, and 12:
 
@@ -1328,6 +1329,7 @@ head(complete_edge_list)
 write.csv(complete_edge_list,file = "complete_edge_list.csv",row.names=F)</pre>
 
 Let's now visualize this edge list in Cytoscape. The end result should look something like this:
+<img src="complete_edge_list.csv.png">
 
 While this is nice, we would like some computational proof of which groups have the highest connectivity and the degree of relationships among groups. We will term "connectivity" for this tutorial simply as the number of neighbors a group has. We will term "degree of relationship" as the number of neighbors through which one group must go before reaching the other group + 1. Looking at our Cytoscape output we see that for connected groups the greatest degree of relationships is 2. For groups in separate clusters we will call their degree of relationship as -Inf.
 
