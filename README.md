@@ -144,7 +144,7 @@ Let's put all of this together for our sickle script using our downloaded fastq 
 
 #!/bin/bash
 #SBATCH --job-name=sickle_run
-#SBATCH --mail-user=wolf.adam.eily@gmail.com
+#SBATCH --mail-user=
 #SBATCH --mail-type=ALL
 #SBATCH -n 1
 #SBATCH -N 1
@@ -154,7 +154,7 @@ Let's put all of this together for our sickle script using our downloaded fastq 
 #SBATCH -e sickle_run_%j.err
 #SBATCH --partition=general
 
-export TMPDIR=/home/CAM/aeily/tmp/
+export TMPDIR=/home/CAM/$USER/tmp/
 
 module load sickle
 
@@ -181,7 +181,7 @@ It is helpful to see how the quality of the data has changed after using sickle.
 
 #!/bin/bash
 #SBATCH --job-name=quality_control
-#SBATCH --mail-user=wolf.adam.eily@gmail.com
+#SBATCH --mail-user=
 #SBATCH --mail-type=ALL
 #SBATCH -n 1
 #SBATCH -N 1
@@ -191,7 +191,7 @@ It is helpful to see how the quality of the data has changed after using sickle.
 #SBATCH -e quality_control_%j.err
 #SBATCH --partition=general
 
-export TMPDIR=/home/CAM/aeily/tmp/
+export TMPDIR=/home/CAM/$USER/tmp/
 
 module load fastqc
 module load MultiQC
@@ -241,7 +241,7 @@ As you can see, we simply enter our reference genome files and the desired prefi
 
 #!/bin/bash
 #SBATCH --job-name=hisat2_run
-#SBATCH --mail-user=wolf.adam.eily@gmail.com
+#SBATCH --mail-user=
 #SBATCH --mail-type=ALL
 #SBATCH -n 1
 #SBATCH -N 1
@@ -251,7 +251,7 @@ As you can see, we simply enter our reference genome files and the desired prefi
 #SBATCH -e hisat2_run_%j.err
 #SBATCH --partition=general
 
-export TMPDIR=/home/CAM/aeily/tmp/
+export TMPDIR=/home/CAM/$USER/tmp/
 
 module load hisat2
 
@@ -424,7 +424,7 @@ The sort function converts SAM files to BAM automatically. Therefore, we can cut
 
 #!/bin/bash
 #SBATCH --job-name=sam_sort_bam
-#SBATCH --mail-user=wolf.adam.eily@gmail.com
+#SBATCH --mail-user=
 #SBATCH --mail-type=ALL
 #SBATCH -n 1
 #SBATCH -N 1
@@ -434,7 +434,7 @@ The sort function converts SAM files to BAM automatically. Therefore, we can cut
 #SBATCH -e sam_sort_bam_%j.err
 #SBATCH --partition=general
 
-export TMPDIR=/home/CAM/aeily/tmp/
+export TMPDIR=/home/CAM/$USER/tmp/
 
 module load samtools
 
@@ -706,7 +706,7 @@ Now we are ready to compile all of our code into a single script:
 
 #!/bin/bash
 #SBATCH --job-name=sam_sort_bam
-#SBATCH --mail-user=wolf.adam.eily@gmail.com
+#SBATCH --mail-user=
 #SBATCH --mail-type=ALL
 #SBATCH -n 1
 #SBATCH -N 1
@@ -716,7 +716,7 @@ Now we are ready to compile all of our code into a single script:
 #SBATCH -e sam_sort_bam_%j.err
 #SBATCH --partition=general
 
-export TMPDIR=/home/CAM/aeily/tmp/
+export TMPDIR=/home/CAM/$USER/tmp/
 
 module load gffread
 module load stringtie
@@ -754,7 +754,7 @@ For many organisms, many of the same genes are expressed in separate cell types,
 <pre style="color: silver; background: black;">-bash-4.2$ exit
 logout
 Connection to xanadu-submit-ext.cam.uchc.edu closed.
-user:~$ scp -r YOUR.USER.NAME@xanadu-submit-ext.cam.uchc.edu:/home/CAM/aeily/rnaseq_for_model_plant/ballgown .</pre>
+user:~$ scp -r YOUR.USER.NAME@xanadu-submit-ext.cam.uchc.edu:/home/CAM/$USER/rnaseq_for_model_plant/ballgown .</pre>
 
 Now we load <a href="https://www.rstudio.com/products/rstudio/download/">RStudio</a> with administrator privileges (otherwise you cannot install packages!).
 
