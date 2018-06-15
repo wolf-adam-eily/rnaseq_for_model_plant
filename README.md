@@ -27,14 +27,27 @@ Our data, SRR3498212, SRR3498213, SRR3498215, SRR3498216 come from root 1, root 
 
 You may connect to Xanadu via SSH, which will place you in your home directory
 
-<pre style="color: silver; background: black;">cd /home/CAM/$USER</pre> 
+<pre style="color: silver; background: black;">-bash-4.2$ cd /home/CAM/$USER</pre> 
 
 Your home directory contains 10TB of storage and will not pollute the capacities of other users on the cluster. 
 
 The workflow may be cloned into the appropriate directory using the terminal command:
-<pre style="color: silver; background: black;">$git clone https://github.com/wolf-adam-eily/rnaseq_for_model_plant.git
-$cd rnaseq_for_model_plant
-$ls</pre>
+<pre style="color: silver; background: black;">-bash-4.2$ git clone https://github.com/wolf-adam-eily/rnaseq_for_model_plant.git
+-bash-4.2$ cd rnaseq_for_model_plant
+-bash-4.2$ ls<
+-bash-4.2$ cd rnaseq_for_model_plant/
+-bash-4.2$ ls
+<strong>all_clusters.csv.png        README.md
+complete_edge_list.csv.png  sam_sort_bam.sh
+cytoscape1.png              sickle_run.sh
+cytoscape2.png              transcript_assembly.sh
+cytoscape3.png              trimmed.html
+cytoscape4.png              trimmed_SRR3498212_fastqc.html
+cytoscape5.png              trimmed_SRR3498213_fastqc.html
+data_dump.sh                trimmed_SRR3498215_fastqc.html
+hisat2_run.sh               trimmed_SRR3498216_fastqc.html
+quality_control.sh</strong>
+</pre>
 
 All of the completed scripts for this tutorial are available for you to submit. However, before submitting, you may want to edit the scripts to include your email!
 
