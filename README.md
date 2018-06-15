@@ -1033,6 +1033,7 @@ results_transcripts = arrange(results_transcripts, pval)
 results_transcripts = subset(results_transcripts, pval < 0.01)
 write.csv(results_transcripts, "transcript_results.csv", row.names=FALSE)
 write.csv(results_genes, "results_genes.csv", row.names=FALSE)
+
 &#35;&#35;we use row.names=FALSE because currently the row names are just the numbers 1, 2, 3. . .
 </pre>
 
@@ -1103,7 +1104,9 @@ There is no match. The reason for this is that biomaRt defaults to animal model 
 <strong>            biomart                      version
 1       plants_mart      Ensembl Plants Genes 39
 2 plants_variations Ensembl Plants Variations 39</strong>
+
 ##if you are confused by the use of the listMarts function, read the useMart guide above!
+
 mart = useMart("plants_mart", host="plants.ensembl.org")
 head(listDatasets(mart))
 <strong>              dataset                             description          version
@@ -1113,7 +1116,9 @@ head(listDatasets(mart))
 4 atrichopoda_eg_gene    Amborella trichopoda genes (AMTR1.0)          AMTR1.0
 5 bdistachyon_eg_gene    Brachypodium distachyon genes (v1.0)             v1.0
 6      bnapus_eg_gene Brassica napus genes (AST_PRJEB5043_v1) AST_PRJEB5043_v1</strong>
+
 ##we see the thale cress as row 3! now we may choose our dataset:
+
 thale_cress_mart = useMart("plants_mart",host="plants.ensembl.org",dataset="athaliana_eg_gene")
 head(thale_cress_mart)
 <strong>Error in x[seq_len(n)] : object of type 'S4' is not subsettable</strong></pre>
@@ -1160,8 +1165,11 @@ A data.frame. There is no implicit mapping between its rows and the function arg
 Let's find out the attributes and filters by following the instructions in the vignette:
 <pre style="color: silver; background: black;">dim(listAttributes(thale_cress_mart))
 <strong>[1] 1118    3</strong>
+
 ##1118 attributes is too many for us to look through. They are ordered somewhat in prevalence of use.
+
 ##let's look at the most commonly used attributes and see if they'll work for us
+
 head(listAttributes(thale_cress_mart))
 <strong>                   name              description         page
 1       ensembl_gene_id           Gene stable ID feature_page
@@ -1170,7 +1178,9 @@ head(listAttributes(thale_cress_mart))
 4       ensembl_exon_id           Exon stable ID feature_page
 5           description         Gene description feature_page
 6       chromosome_name Chromosome/scaffold name feature_page</strong>
+
 ##we don't know the chromosome name, so we can just take attributes 1,3, and 5
+
 thale_cress_data_frame = getBM(attributes=c("ensembl_gene_id","ensembl_peptide_id","description"),mart=thale_cress_mart)
 head(thale_cress_data_frame)
 <strong>
@@ -1216,6 +1226,7 @@ Should we only want to annotate genes from a specific chromosome or any other cr
 4       AT2G45780                       other RNA [Source:TAIR;Acc:AT2G45780]
 5       AT2G42425                    Unknown gene [Source:TAIR;Acc:AT2G42425]
 6       AT4G01533                       other RNA [Source:TAIR;Acc:AT4G01533]</strong>
+
 head(results_genes)
 <strong> feature         id           fc         pval      qval
 1    gene MSTRG.4142 2.075827e-01 0.0000491845 0.5184498
@@ -1235,13 +1246,17 @@ head(annotated_genes)
 5350       AT1G79830        AT1G79830.2 Golgin Putative 5 [Source:UniProtKB/TrEMBL;Acc:F4HQB9]
 5351       AT1G79830        AT1G79830.4 Golgin Putative 5 [Source:UniProtKB/TrEMBL;Acc:F4HQB9]
 5352       AT1G79830        AT1G79830.5 Golgin Putative 5 [Source:UniProtKB/TrEMBL;Acc:F4HQB9]</strong>
+
 ##let's check our dimensions to ensure every gene was annotated
 
 dim(results_genes)
 <strong>[1] 216   5</strong>
+
 dim(annotated_genes)
 <strong>[1] 233   3</strong>
+
 ##our dimensions do not match! Let's investigate:
+
 head(annotated_genes)
 <strong>     ensembl_gene_id ensembl_peptide_id                                            description
 340        AT2G07754                                      pre-tRNA [Source:TAIR;Acc:AT2G07754]
@@ -1307,8 +1322,10 @@ Lastly, let's remove the MSTRG sequences from our gene results object and write 
 
 <pre style="color: silver; background: black;">write.csv(file="annotated_genes.csv",annotated_genes,row.names=F)
 results_genes = subset(results_genes, id %in% annotated_genes$ensembl_gene_id)
+
 dim(results_genes)
 <strong> 116 5</strong>
+
 head(results_genes)
 <strong>feature        id         fc         pval      qval
 2     gene AT4G14220 21.0384627 0.0001882308 0.5184498
@@ -1317,6 +1334,7 @@ head(results_genes)
 10    gene AT5G15570  7.1289982 0.0004775700 0.5184498
 11    gene AT4G09150  0.3713041 0.0005426543 0.5184498
 12    gene AT2G39890 28.5590198 0.0005462862 0.5184498</strong>
+
 write.csv(file="results_genes.csv",results_genes,row.names=F)</pre>
 
 Now we want to visualize our data:
