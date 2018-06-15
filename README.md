@@ -231,7 +231,13 @@ fastqc will create the files "trimmed_file_fastqc.html". To have a look at one, 
 
 This script will create a directory "trimmed_data". Let's look inside of that directory:
 
-<pre style="color: silver; background: black;">-bash-4.2$ cd trimmed_data</pre>
+<pre style="color: silver; background: black;">-bash-4.2$ cd trimmed_data<
+-bash-4.2$ ls 
+<strong>multiqc_fastqc.txt         multiqc.log
+multiqc_general_stats.txt  multiqc_sources.txt
+</strong></pre>
+
+I invite you to explore the files on your own as they are quite straight-forward.
 
 
 <h2 id="Fourth_Point_Header">Aligning reads to a genome using hisat2</h2>
