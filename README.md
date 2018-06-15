@@ -25,6 +25,19 @@ The Single Read Archive, or SRA, is a publicly available database containing rea
 
 Our data, SRR3498212, SRR3498213, SRR3498215, SRR3498216 come from root 1, root 2, shoot 1, and shoot 2 of a single thale cress, respectively. Our objective in this analysis is to determine which genes are expressed in all samples, quantify the expression of each common gene in each sample, identify genes which are lowly expressed in roots 1 and 2 but highly expressed in shoots 1 and 2, or vice versa, quantify the relative expression of such genes, and lastly to create a visual topological network of genes with similar expression profiles.
 
+You may connect to Xanadu via SSH, which will place you in your home directory
+
+<pre style="color: silver; background: black;">cd /home/CAM/$USER/pre> 
+
+Your home directory contains 10TB of storage and will not pollute the capacities of other users on the cluster. 
+
+The workflow may be cloned into the appropriate directory using the terminal command:
+<pre style="color: silver; background: black;">$git clone https://github.com/wolf-adam-eily/rnaseq_for_model_plant.git
+$cd rnaseq_for_model_plant
+$ls</pre>
+
+All of the completed scripts for this tutorial are available for you to submit. However, before submitting, you may want to edit the scripts to include your email!
+
 Before beginning, we need to understand a few aspects of the Xanadu server. When first logging into Xanadu from your local terminal, you will be connected to the submit node. The submit node is the interface with which users on Xanadu may <i>submit</i> their processes to the desired compute nodes, which will run the process. Never, under any circumstance, run processes directly in the submit node. Your process will be killed and all of your work lost! This tutorial will not teach you shell script configuration to submit your tasks on Xanadu. Therefore, before moving on, read and master the topics covered in the <a href="https://bioinformatics.uconn.edu/resources-and-events/tutorials/xanadu/">Xanadu tutorial</a>.
 
 Now that we have covered the introduction and objective of our analysis, we may begin!
