@@ -850,7 +850,7 @@ Because of the structure of our ballgown directory, we may use dataDir = "ballgo
 We want all of the objects in our arguments to be in the same order as they are present in the ballgown directory. Therefore, we want our pData matrix to have two columns -- the first column being the samples as they appear in the ballgown directory, and the second being the phenotype of each sample in the column before it (root or shoot). Let's see the order of our sample files:
 
 <pre style="color: silver; background: black;">list.files("ballgown/")
-&#35;&#35; [1] "athaliana_root_1"  "athaliana_root_2"  "athaliana_shoot_1" "athaliana_shoot_2"</pre>
+<strong>[1] "athaliana_root_1"  "athaliana_root_2"  "athaliana_shoot_1" "athaliana_shoot_2"</strong></pre>
 
 Now we construct a 4x2 phenotype matrix with the first column being our samples in order and the second each sample's phenotype:
 
@@ -868,12 +868,11 @@ colnames(pheno_matrix) <- c("sample", "part")
 rownames(pheno_matrix) <- pheno_matrix[,1]
 
 pheno_matrix
-
-&#35;&#35;                             sample  part
-&#35;&#35;athaliana_root_1   athaliana_root_1  root
-&#35;&#35;athaliana_root_2   athaliana_root_2  root
-&#35;&#35;athaliana_shoot_1 athaliana_shoot_1 shoot
-&#35;&#35;athaliana_shoot_2 athaliana_shoot_2 shoot</pre>
+<strong>                             sample  part
+athaliana_root_1   athaliana_root_1  root
+athaliana_root_2   athaliana_root_2  root
+athaliana_shoot_1 athaliana_shoot_1 shoot
+athaliana_shoot_2 athaliana_shoot_2 shoot</strong></pre>
 
 We may now create our ballgown object:
 
@@ -1024,9 +1023,9 @@ those values are:
 
 <pre style="color: silver; background: black;">
 min(fpkm)
-&#35;&#35;0
+<strong>0</strong>
 max(fpkm)
-&#35;&#35;1179157
+<strong>1179157</strong>
 </pre>
 Due to the scaling, we cannot truly see the distribution. However, what we <i>can</i> do is to transform the data such that the variance is not so staggering, allowing us to see better. There are a few rules for this, all of the data must be transformed in a consistent and reversible manner, after transformation no data may have a negative value, and all data with a value of 0 must also be 0 after transformation. The reason for the second and third rules is more epistemological. For us, if a gene has an FPKM of 0, then for that sample the gene is unexpressed. Should we transform the data and that particular gene's FPKM is now above 0, we are fundamentally changing the nature of that sample -- i.e., we are now saying it is expresesing a gene it actually is not! Additionally, there is no such thing as negative expression, so there is no physical reality where we will have an FPKM beneath 0. With these three rules, we see that taking the log of all our data will prevent negative values, be consistent and reversible, and scale down our variance. However, log(0) = -inf! We have broken a cardinal rule (oddly enough, the fact that it is infinity is not a rule-breaker, but rather that it is <b>negative</b> infinity! Seeing this, we can simply add 1 to our data before log transforming, log(0+1) = 0. Now we have fulfilled all three rules.
 
@@ -1038,9 +1037,9 @@ We now we see an actual distribution. Let's see the difference in distribution b
 
 <pre style="color: silver; background: black;">
 dim(fpkm)
-&#35;&#35;41854     4
+<strong>41854     4</strong>
 colnames(fpkm)
-&#35;&#35;"FPKM.athaliana_root_1"  "FPKM.athaliana_root_2"  "FPKM.athaliana_shoot_1" "FPKM.athaliana_shoot_2"
+<strong>"FPKM.athaliana_root_1"  "FPKM.athaliana_root_2"  "FPKM.athaliana_shoot_1" "FPKM.athaliana_shoot_2"</strong>
 
 plot(density(fpkm[,1]),main="Density Comparison")
 lines(density(fpkm[,2])
