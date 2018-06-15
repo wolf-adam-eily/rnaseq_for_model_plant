@@ -1011,7 +1011,20 @@ getFC = TRUE, meas = "FPKM")
 
 results_genes = stattest(bg_filt, feature="gene" , covariate = "part" , getFC = TRUE, meas = "FPKM")</pre>
 
-Now we want to order our results according to their pvalue, and then subset to only take results with pvalues below 0.01, writing our findings to a csv:
+Let's take a look at this object:
+
+<pre style="color: silver; background: black;">head(gene_results)
+<strong>  feature         id           fc         pval      qval
+1    gene MSTRG.4142 2.075827e-01 0.0000491845 0.5184498
+2    gene  AT4G14220 2.103846e+01 0.0001882308 0.5184498
+3    gene MSTRG.3788 5.031936e-03 0.0002087393 0.5184498
+4    gene MSTRG.5824 2.867578e-03 0.0002187155 0.5184498
+5    gene  MSTRG.568 3.186395e-01 0.0002764999 0.5184498
+6    gene  MSTRG.811 3.236509e-04 0.0003448702 0.5184498</strong></pre>
+
+Each differentially expressed gene (or isoform) is listed, alongside its ID, fold-change (percent increase), <a href="https://en.wikipedia.org/wiki/P-value">p-value</a>, and <a href="http://www.statisticshowto.com/q-value/">q-value</a>.
+
+Now we want to order our results according to their p-value, and then subset to only take results with p-values below 0.01, writing our findings to a csv:
 
 <pre style="color: silver; background: black;">
 results_genes = arrange(results_genes,pval)
@@ -1022,6 +1035,168 @@ write.csv(results_transcripts, "transcript_results.csv", row.names=FALSE)
 write.csv(results_genes, "gene_results.csv", row.names=FALSE)
 &#35;&#35;we use row.names=FALSE because currently the row names are just the numbers 1, 2, 3. . .
 </pre>
+
+We should take advantage while we have this results_genes object and annotate the genes we have deemed significant (p-values below 0.01, every gene now in this object). To annotate the genes we will be using <a href="https://www.bioconductor.org/packages/devel/bioc/html/biomaRt.html"</a>biomaRt</a> and biomartr. You can install these with the following code:
+<pre style="color: silver; background: black;">
+## try http:// if https:// URLs are not supported
+source("https://bioconductor.org/biocLite.R")
+biocLite("biomaRt")
+install.packages("biomartr")</pre>
+
+The first step in annotating our genes of interest is to choose our database. We do this using the "useMart" function of biomaRt:
+<pre style="color: silver; background: black;">library(biomaRt)
+library(biomartr)
+??biomaRt::useMart
+
+useMart {biomaRt}	R Documentation
+Connects to the selected BioMart database and dataset
+
+<strong>Description</strong>
+
+<em>A first step in using the biomaRt package is to select a BioMart database and dataset to use. The useMart function enables one to connect to a specified BioMart database and dataset within this database. To know which BioMart databases are available see the listMarts function. To know which datasets are available within a BioMart database, first select the BioMart database using useMart and then use the listDatasets function on the selected BioMart, see listDatasets function.</em>
+
+<strong>Usage</strong>
+
+useMart(biomart, dataset, host="www.ensembl.org",
+path="/biomart/martservice", port=80, archive=FALSE, ssl.verifypeer =
+TRUE, ensemblRedirect = NULL, version, verbose = FALSE)
+<strong>Arguments</strong>
+
+biomart		BioMart database name you want to connect to. Possible database names can be retrieved with the functio listMarts
+dataset		Dataset you want to use. To see the different datasets available within a biomaRt you can e.g. do: mart = 
+		useMart('ensembl'), followed by listDatasets(mart).
+host		Host to connect to. Defaults to www.ensembl.org
+path		Path that should be pasted after to host to get access to the web service URL
+port		port to connect to, will be pasted between host and path 
+archive		Boolean to indicate if you want to access archived versions of BioMart databases. Note that this argument is now 
+		deprecated and will be removed in the future. A better alternative is to leave archive = FALSE and to specify the url 
+		of the archived BioMart you want to access. For Ensembl you can view the list of archives using listEnsemblArchives
+ssl.verifypeer	Set SSL peer verification on or off. By default ssl.verifypeer is set to TRUE
+ensemblRedirect	This argument has now been deprecated.
+version		Use version name instead of biomart name to specify which BioMart you want to use
+verbose		Give detailed output of what the method is doing while in use, for debugging</pre>
+
+A quick google search will show that the genome we used, TAIR10, is the Ensembl format of the thale cress. We are going to want to use the gene dataset. Let's verify that it is there following the instructions provided:
+<pre style="color: silver; background: black;">mart = useMart("ensembl")
+ head(listDatasets(mart))
+<strong>                      dataset                        description      version
+1  acarolinensis_gene_ensembl     Anole lizard genes (AnoCar2.0)    AnoCar2.0
+2   amelanoleuca_gene_ensembl              Panda genes (ailMel1)      ailMel1
+3     amexicanus_gene_ensembl        Cave fish genes (AstMex102)    AstMex102
+4     anancymaae_gene_ensembl Ma's night monkey genes (Anan_2.0)     Anan_2.0
+5 aplatyrhynchos_gene_ensembl          Duck genes (BGI_duck_1.0) BGI_duck_1.0
+6        btaurus_gene_ensembl                 Cow genes (UMD3.1)       UMD3.1</strong></pre>
+
+We want to scan this for the thale cress. But first, let's make sure we can scan it, period:
+
+<pre style="color: silver; background: black;">listDatasets(mart)[grep("thaliana",listDatasets(mart)[,1]),]
+<strong>                    dataset           description version
+2 amelanoleuca_gene_ensembl Panda genes (ailMel1) ailMel1</strong></pre>
+
+We subset the listDatasets(mart) dataframe to include all rows which have the substring "amelanoleuca" in them. The return is row 2, which we can easily verify matches the head of the dataframe. Now let's try it with our species, "thaliana":
+<pre style="color: silver; background: black;">listDatasets(mart)[grep("thaliana",listDatasets(mart)[,1]),]
+<strong>[1] dataset     description version    
+<0 rows> (or 0-length row.names)</strong></pre>
+
+There is no match. The reason for this is that biomaRt defaults to animal model organisms! We need to access the plant database. Now let's try:
+<pre style="color: silver; background: black;">listMarts(host="plants.ensembl.org")
+<strong>            biomart                      version
+1       plants_mart      Ensembl Plants Genes 39
+2 plants_variations Ensembl Plants Variations 39</strong>
+##if you are confused by the use of the listMarts function, read the useMart guide above!
+mart = useMart("plants_mart", host="plants.ensembl.org")
+head(listDatasets(mart))
+<strong>              dataset                             description          version
+1     alyrata_eg_gene        Arabidopsis lyrata genes (v.1.0)            v.1.0
+2   atauschii_eg_gene    Aegilops tauschii genes (ASM34733v1)       ASM34733v1
+3   athaliana_eg_gene     Arabidopsis thaliana genes (TAIR10)           TAIR10
+4 atrichopoda_eg_gene    Amborella trichopoda genes (AMTR1.0)          AMTR1.0
+5 bdistachyon_eg_gene    Brachypodium distachyon genes (v1.0)             v1.0
+6      bnapus_eg_gene Brassica napus genes (AST_PRJEB5043_v1) AST_PRJEB5043_v1</strong>
+##we see the thale cress as row 3! now we may choose our dataset:
+thale_cress_mart = useMart("plants_mart",host="plants.ensembl.org",dataset="athaliana_eg_gene")
+head(thale_cress_mart)
+<strong>Error in x[seq_len(n)] : object of type 'S4' is not subsettable</strong></pre>
+
+Our mart is in the <a href="http://adv-r.had.co.nz/S4.html">S4</a> class and not readable right now. We can process it by using the "getBM" function:
+<pre style="color: silver; background: black;">??biomaRt::getBM
+
+Retrieves information from the BioMart database
+
+<strong>Description</strong>
+
+<em>This function is the main biomaRt query function. Given a set of filters and corresponding values, it retrieves the user specified attributes from the BioMart database one is connected to.</em>
+
+<strong>Usage</strong>
+
+getBM(attributes, filters = "", values = "", mart, curl = NULL, 
+checkFilters = TRUE, verbose = FALSE, uniqueRows = TRUE, bmHeader = FALSE,
+quote = "\"")
+<strong>Arguments</strong>
+
+attributes	Attributes you want to retrieve. A possible list of attributes can be retrieved using the function listAttributes.
+filters		Filters (one or more) that should be used in the query. A possible list of filters can be retrieved using the function 
+		listFilters.
+values		Values of the filter, e.g. vector of affy IDs. If multiple filters are specified then the argument should be a list of 
+		vectors of which the position of each vector corresponds to the position of the filters in the filters argument.
+mart		object of class Mart, created with the useMart function.
+curl		An optional 'CURLHandle' object, that can be used to speed up getBM when used in a loop.
+checkFilters	Sometimes attributes where a value needs to be specified, for example upstream\_flank with value 20 for obtaining 
+		upstream sequence flank regions of length 20bp, are treated as filters in BioMarts. To enable such a query to work, one 
+		must specify the attribute as a filter and set checkFilters = FALSE for the query to work.
+verbose		When using biomaRt in webservice mode and setting verbose to TRUE, the XML query to the webservice will be printed.
+uniqueRows	If the result of a query contains multiple identical rows, setting this argument to TRUE (default) will result in 
+		deleting the duplicated rows in the query result at the server side.
+bmHeader	Boolean to indicate if the result retrieved from the BioMart server should include the data headers or not, defaults to 
+		FALSE. This should only be switched on if the default behavior results in errors, setting to on might still be able to 
+		retrieve your data in that case
+quote		Sometimes parsing of the results fails due to errors in the Ensembl data fields such as containing a quote, in such 
+		cases you can try to change the value of quote to try to still parse the results.
+
+<strong>Value</strong>
+
+A data.frame. There is no implicit mapping between its rows and the function arguments (e.g. filters, values), therefore make sure to have the relevant identifier(s) returned by specifying them in attributes. See Examples.</pre>
+
+Let's find out the attributes and filters by following the instructions in the vignette:
+<pre style="color: silver; background: black;">dim(listAttributes(thale_cress_mart))
+<strong>[1] 1118    3</strong>
+##1118 attributes is too many for us to look through. They are ordered somewhat in prevalence of use.
+##let's look at the most commonly used attributes and see if they'll work for us
+head(listAttributes(thale_cress_mart))
+<strong>                   name              description         page
+1       ensembl_gene_id           Gene stable ID feature_page
+2 ensembl_transcript_id     Transcript stable ID feature_page
+3    ensembl_peptide_id        Protein stable ID feature_page
+4       ensembl_exon_id           Exon stable ID feature_page
+5           description         Gene description feature_page
+6       chromosome_name Chromosome/scaffold name feature_page</strong>
+##we don't know the chromosome name, so we can just take attributes 1-5
+thale_cress_data_frame = getBM(attributes=c("ensembl_gene_id","ensembl_transcript_id","ensembl_peptide_id","ensembl_exon_id","description"),mart=thale_cress_mart)
+head(thale_cress_data_frame)
+<strong>  ensembl_gene_id ensembl_transcript_id ensembl_peptide_id   ensembl_exon_id	description
+1       AT3G11415           AT3G11415.1                    AT3G11415.1.exon1	other RNA
+2       AT1G31258           AT1G31258.1                    AT1G31258.1.exon1	other RNA
+3       AT1G31258           AT1G31258.1                    AT1G31258.1.exon2	other RNA
+4       AT5G24735           AT5G24735.1                    AT5G24735.1.exon1	other RNA
+5       AT5G24735           AT5G24735.1                    AT5G24735.1.exon2	other RNA
+6       AT2G45780           AT2G45780.1                    AT2G45780.1.exon1	other RNA</strong></pre>
+
+The default descriptions are certainly underwhelming. Let's see if there are any other types of descriptions we can get:
+
+<pre style="color: silver; background: black;">listAttributes(thale_cress_mart)[grep("descr",listAttributes(thale_cress_mart)[,1]),]
+<strong>                           name                description         page
+5                   description           Gene description feature_page
+34       goslim_goa_description     GOSlim GOA Description feature_page
+115  interpro_short_description Interpro Short Description feature_page
+116        interpro_description       Interpro Description feature_page
+153                 description           Gene description    structure
+180                 description           Gene description     homologs
+1039                description           Gene description          snp
+1042         source_description Variant source description          snp
+1080                description           Gene description    sequences</strong></pre>
+
+Finding the other descriptions will take much, much longer. For this tutorial we will be sticking with our un-impressive descriptions. However, you may choose the description best for you and your resesarch.
+
 
 Now we want to visualize our data:
 
