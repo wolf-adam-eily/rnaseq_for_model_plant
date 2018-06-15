@@ -251,7 +251,25 @@ This script will also create a directory "trimmed_data". Let's look inside of th
 multiqc_general_stats.txt  multiqc_sources.txt
 </strong></pre>
 
-I invite you to explore the files on your own as they are quite straight-forward.
+Let's have a look at the file format from fastqc and multiqc. When loading the fastqc file, you will be greeted with this screen:
+<img src="fastqc1.png">
+
+There are some basic statistics which are all pretty self-explanatory. Notice that none of our sequences fail the quality report! It would be concerning if we had even one because this report is from our trimmed sequence! The same thinking applies to our sequence length. Should the minimum of the sequence length be below 45, we would know that sickle had not run properly. Let's look at the next index in the file:
+<img src="fastqc2.png">
+
+This screen is simply a <a href="https://en.wikipedia.org/wiki/Box_plot">box-and-whiskers plot</a> of our quality scores per base pair. Note that there is a large variance and lower mean scores (but still about in our desired range) for base pairs 1-5. These are the primer sequences! I will leave it to you to ponder the behavior of this graph. If you're stumped, you may want to learn how <a href="https://www.illumina.com/techniques/sequencing.html">Illumina sequencing"</a> works.
+
+Our next index is the per sequence quality scores:
+<img src="fastqc3.png">
+
+This index is simply the total number of base pairs (y-axis) which have a given quality score (x-axis). This plot is discontinuous and discrete, and should you calculate the <a href=https://en.wikipedia.org/wiki/Riemann_sum">Riemann sum</a> the result is the total number of base pairs present across all reads.
+	
+The last index at which we are going to look is the "Overrepresented Sequences" index:
+<img src="fastqc4.png">
+This is simply a list of sequences which appear disproportionately in our reads file. The reads file actually includes the primer sequences for this exact reason. When fastqc calculates a sequence which appears many times beyond the expected distribution, it may check the primer sequences in the reads file to determine if the sequence is a primer. If the sequence is not a primer, the result will be returned as "No Hit". Sequences which are returned as "No Hit" are most likely highly expressed genes.
+
+We see that our multiqc file has the same indices as our fastqc files, but is simply the mean of all the statistics across our fastqc files:
+<img src="multiqc.png">
 
 
 <h2 id="Fourth_Point_Header">Aligning reads to a genome using hisat2</h2>
@@ -1206,7 +1224,7 @@ dist_diffexp_genes = dist(diffexp_genes)
 head(dist_diffexp_genes)
 <strong>[1]  20.83087999   0.20255079   0.20471515   0.11105679   0.20725907   0.16655252  19.67123966  17.15730053</strong></pre>
 
-Do not worry that there are no names in this output! dist() has kept track of the names and you may trust this output. Now we may move on to creating our groups for the tree based on the distances. We will be using hclust(), which is a <a href="https://en.wikipedia.org/wiki/Hierarchical_clustering>hierarchical clustering</a> command. We won't go into the math involved, as your brain is probably quite tired already. However, hclust requires only one argument, the output of the dist() function. Let's try it:
+Do not worry that there are no names in this output! dist() has kept track of the names and you may trust this output. Now we may move on to creating our groups for the tree based on the distances. We will be using hclust(), which is a <a href="https://en.wikipedia.org/wiki/Hierarchical_clustering">hierarchical clustering</a> command. We won't go into the math involved, as your brain is probably quite tired already. However, hclust requires only one argument, the output of the dist() function. Let's try it:
 	
 <pre style="color: silver; background: black;">clusters = hclust(dist_diffexp_genes)</pre>
 
@@ -1368,7 +1386,7 @@ While this is nice, we would like some computational proof of which groups have 
 
 If you click on the export button in Cytoscape, we will have the option of exporting the network. Click on that and export the network as a .xml file. 
 
-Now, <a href=https://support.office.com/en-us/article/import-xml-data-6eca3906-d6c9-4f0d-b911-c736da817fa4#bmopen_an_xml_data_file">open the .xml file in Microsoft Excel</a>, and you should see something like this:
+Now, <a href="https://support.office.com/en-us/article/import-xml-data-6eca3906-d6c9-4f0d-b911-c736da817fa4#bmopen_an_xml_data_file">open the .xml file in Microsoft Excel</a>, and you should see something like this:
 
 While we will not go into great detail here, we are interesetd in the ns1:data4 column. Copy and paste that column into a new Excel workbook and save it under the name "interaction_list.csv". Now let's load this file into R:
 
@@ -1416,7 +1434,7 @@ interaction_list[1]
 &#35;&#35;this value is not needed, let's remove it from our interaction list
 interaction_list = interaction_list[2:73]
 </pre>
-Now we simply need to create a matrix which contains all of our sources (the group before "interacts with") in the first column and all of their sinks (the group after "interacts with") in the second column. First, it will be useful to remove "(interacts with)" from all of the elements. We can do this using <a href=http://stat.ethz.ch/R-manual/R-devel/library/base/html/grep.html">gsub</a>:
+Now we simply need to create a matrix which contains all of our sources (the group before "interacts with") in the first column and all of their sinks (the group after "interacts with") in the second column. First, it will be useful to remove "(interacts with)" from all of the elements. We can do this using <a href="http://stat.ethz.ch/R-manual/R-devel/library/base/html/grep.html">gsub</a>:
 <pre style="color: silver; background: black;">	
 interaction_list = gsub("[[:punct:]]interacts with[[:punct:]] ","",interaction_list)
 interaction_list
