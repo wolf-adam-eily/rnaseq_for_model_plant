@@ -17,7 +17,7 @@ This repository is a usable, publicly available tutorial for analyzing different
 </ul>
 </div>
 
-<h2 id="First_Point_Header">Introduction and Programs</h2>
+<h2 id="First_Point_Header">Introduction and programs</h2>
 
 In this tutorial, we will be analyzing thale cress (Arabidopsis thaliana) RNA-Seq data from various parts of the plant (roots, stems). Perhaps one of the most common organisms for genetic study, the aggregrate wealth of genetic information of the thale cress makes it ideal for new-comers to learn. Organisms such as this we call "model organisms". You may think of model organisms as a subset of living things which, under the normal conventions of analysis, behave nicely. The data we will be analyzing comes from an experiment in which various cellular RNA was collected from the roots and shoots of a single thale cress. The RNA profiles are archived in the SRA, and meta-information on each may be viewed through the SRA ID: <a href="https://www.ncbi.nlm.nih.gov/sra?term=SRX1756762">SRR3498212</a>, <a href="https://www.ncbi.nlm.nih.gov/sra/?term=SRR3498213">SRR3498213</a>, <a href="https://www.ncbi.nlm.nih.gov/sra?term=SRX1756765">SRR3498215</a>, <a href="https://www.ncbi.nlm.nih.gov/sra?term=SRX1756766">SRR3498216</a>.
 
@@ -27,7 +27,7 @@ Our data, SRR3498212, SRR3498213, SRR3498215, SRR3498216 come from root 1, root 
 
 You may connect to Xanadu via SSH, which will place you in your home directory
 
-<pre style="color: silver; background: black;">cd /home/CAM/$USER/pre> 
+<pre style="color: silver; background: black;">cd /home/CAM/$USER</pre> 
 
 Your home directory contains 10TB of storage and will not pollute the capacities of other users on the cluster. 
 
