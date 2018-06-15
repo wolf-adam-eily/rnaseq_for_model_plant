@@ -13,7 +13,6 @@ This repository is a usable, publicly available tutorial for analyzing different
 <li><a href="#Sixth_Point_Header">6 Differential expression analysis using ballgown</a></li>
 <li><a href="#Seventh_Point_Header">7 Topological networking using cytoscape</a></li>
  <li><a href="#Eighth_Point_Header">8 Conclusion</a></li>
-<li><a href="#Citation">Citations</a></li>
 </ul>
 </div>
 
