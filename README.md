@@ -132,9 +132,9 @@ Sickle performs quality control on illumina paired-end and single-end short read
 
 -bash-4.2$ sickle
 
-Usage: sickle <command> [options]
+<strong>Usage</strong>: sickle <command> [options]
 
-Command:
+<strong>Command</strong>:
 pe	paired-end sequence trimming
 se	single-end sequence trimming
 
@@ -145,9 +145,9 @@ We have single-end sequences.
 
 <pre style="color: silver; background: black;">-bash-4.2$ sickle se
 
-Usage: sickle se [options] -f <fastq sequence file> -t <quality type> -o <trimmed fastq file>
+<strong>Usage</strong>: sickle se [options] -f <fastq sequence file> -t <quality type> -o <trimmed fastq file>
 
-Options:
+<strong>Options</strong>:
 -f, --fastq-file, Input fastq file (required)
 -t, --qual-type, Type of quality values (solexa (CASAVA < 1.3), illumina (CASAVA 1.3 to 1.7), sanger (which is CASAVA >= 1.8)) (required)
 -o, --output-file, Output trimmed fastq file (required)
@@ -257,13 +257,13 @@ I invite you to explore the files on your own as they are quite straight-forward
 <a href="https://ccb.jhu.edu/software/hisat2/manual.shtml">HISAT2</a> is a fast and sensitive aligner for mapping next generation sequencing reads against a reference genome. HISAT2 requires two arguments: the reads file being mapped and the indexed genome to which those reads are mapped. Typically, the hisat2-build command is used to make a HISAT index file for the genome. It will create a set of files with the suffix .ht2, these files together build the index. What is an index and why is it helpful? Genome indexing is the same as indexing a tome, like an encyclopedia. It is much easier to locate information in the vastness of an encyclopedia when you consult the index, which is ordered in an easily navigatable way with pointers to the location of the information you seek within the encylopedia. Genome indexing is thus the structuring of a genome such that it is ordered in an easily navigatable way with pointers to where we can find whichever gene is being aligned. Let's have a look at how the hisat2-build command works:
 
 <pre style="color: silver; background: black;">-bash-4.2$ module load hisat2
-bash-4.2$ hisat2-build
+-bash-4.2$ hisat2-build
 
 No input sequence or sequence file specified!
 HISAT2 version 2.1.0 by Daehwan Kim (infphilo@gmail.com, http://www.ccb.jhu.edu/people/infphilo)
-Usage: hisat2-build [options]* <reference_in> <ht2_index_base>
-    reference_in            comma-separated list of files with ref sequences
-    hisat2_index_base       write ht2 data to files with this dir/basename</pre>
+<strong>Usage</strong>: hisat2-build [options]* <reference_in> <ht2_index_base>
+	reference_in            comma-separated list of files with ref sequences
+	hisat2_index_base       write ht2 data to files with this dir/basename</strong></pre>
 
 As you can see, we simply enter our reference genome files and the desired prefix for our .ht2 files. Now, fortunately for us, Xanadu has many indexed genomes which we may use. To see if there is a hisat2 <i>Arabidopsis thaliana</i> indexed genome we need to look at the <a href="https://bioinformatics.uconn.edu/databases/">Xanadu databases</a> page. We see that our desired indexed genome is in the location /isg/shared/databases/alignerIndex/plant/Arabidopsis/thaliana/Athaliana_HISAT2/. Now we are ready to align our reads using hisat2 (for hisat2, the script is going to be written first with an explanation of the options after).
 
@@ -310,10 +310,10 @@ hisat2 -p 16 --dta -x /isg/shared/databases/alignerIndex/plant/Arabidopsis/thali
 
 Once the mapping have been completed, the file structure is as follows:
 <pre style="color: silver; background: black;">bash-4.2$ ls
-|-- athaliana_root_1.sam
-|-- athaliana_root_2.sam
-|-- athaliana_shoot_1.sam
-|-- athaliana_shoot_2.sam</pre>
+<strong>athaliana_root_1.sam
+athaliana_root_2.sam
+athaliana_shoot_1.sam
+athaliana_shoot_2.sam</strong></pre>
 
 When HISAT2 completes its run, it will summarize each of it’s alignments, and it is written to the standard error file, which can be found in the same folder once the run is completed.
 
@@ -380,9 +380,9 @@ Because of the density of the sam file, it is compressed to binary to create a m
 
 <pre style="color: silver; background: black;">-bash-4.2$ module load samtools
 bash-4.2$ samtools
-Usage:   samtools <command> [options]
+<strong>Usage</strong>:   samtools <command> [options]
 
-Commands:
+<strong>Commands</strong>:
   -- Indexing
      dict           create a sequence dictionary file
      faidx          index/extract FASTA
@@ -426,8 +426,8 @@ We are truly only interested in sorting our SAM files.
 
 <pre style="color: silver; background: black;">-bash-4.2$ samtools sort
 
-Usage: samtools sort [options...] [in.bam]
-Options:
+<strong>Usage</strong>: samtools sort [options...] [in.bam]
+<strong>Options</strong>:
   -l INT     Set compression level, from 0 (uncompressed) to 9 (best)
   -m INT     Set maximum memory per thread; suffix K/M/G recognized [768M]
   -n         Sort by read name
@@ -554,8 +554,8 @@ stringtie -p 16 athaliana_shoot_2.bam -G athaliana_TAIR10_genes.gtf -o athaliana
 Let's have a look at the stringtie output:
 
 <pre style="color: silver; background: black;">-bash-4.2$ athaliana_root_1.gtf
-# stringtie -p 16 rnaseq_athaliana_root_1.bam -G athaliana_TAIR10_genes.gtf -o rnaseq_athaliana_root_1.gtf
-# StringTie version 1.3.3b
+&#35; stringtie -p 16 rnaseq_athaliana_root_1.bam -G athaliana_TAIR10_genes.gtf -o rnaseq_athaliana_root_1.gtf
+&#35; StringTie version 1.3.3b
 Chr1	StringTie	transcript	28500	28706	1000	+	.	gene_id "STRG.1"; transcript_id "STRG.1.1"; reference_id "AT1G01046.1"; ref_gene_id "AT1G01046"; ref_gene_name "AT1G01046"; cov "0.241546"; FPKM "3.727008"; TPM "0.747930";
 Chr1	StringTie	exon	28500	28706	1000	+	.	gene_id "STRG.1"; transcript_id "STRG.1.1"; exon_number "1"; reference_id "AT1G01046.1"; ref_gene_id "AT1G01046"; ref_gene_name "AT1G01046"; cov "0.241546";
 Chr1	StringTie	transcript	47494	48839	1000	-	.	gene_id "STRG.2"; transcript_id "STRG.2.1"; cov "3.928230"; FPKM "60.611832"; TPM "12.163484";
@@ -623,16 +623,16 @@ We see we have a condensed form of our various exons. The exon loci name is the 
 
   GNU nano 2.3.1                                                      File: merged.stats                                                                                                                    
 
-# gffcompare v0.10.4 | Command line was:
-#gffcompare -r athaliana_TAIR10_genes.gtf -G -o merged stringtie_merged.gtf
-#
+&#35; gffcompare v0.10.4 | Command line was:
+&#35;gffcompare -r athaliana_TAIR10_genes.gtf -G -o merged stringtie_merged.gtf
+&#35;
 
-#= Summary for dataset: stringtie_merged.gtf
-#     Query mRNAs :   41854 in   33403 loci  (30272 multi-exon transcripts)
-#            (6013 multi-transcript loci, ~1.3 transcripts per locus)
-# Reference mRNAs :   41607 in   33350 loci  (30127 multi-exon)
-# Super-loci w/ reference transcripts:    33184
-#-----------------| Sensitivity | Precision  |
+&#35;= Summary for dataset: stringtie_merged.gtf
+&#35;     Query mRNAs :   41854 in   33403 loci  (30272 multi-exon transcripts)
+&#35;            (6013 multi-transcript loci, ~1.3 transcripts per locus)
+&#35; Reference mRNAs :   41607 in   33350 loci  (30127 multi-exon)
+&#35; Super-loci w/ reference transcripts:    33184
+&#35;-----------------| Sensitivity | Precision  |
         Base level:   100.0     |    99.9    |
         Exon level:   100.0     |    99.9    |
       Intron level:   100.0     |   100.0    |
