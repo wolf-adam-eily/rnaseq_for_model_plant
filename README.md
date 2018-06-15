@@ -1,6 +1,6 @@
 # RNA-Seq for Model Plant (Arabidopsis thaliana)
 
-This repository is a usable, publicly available tutorial for analyzing differential expression data and creating topological gene networks. All steps have been provided for the UConn CBC Xanadu cluster here with appropriate headers for the Slurm scheduler that can be modified simply to run.  Commands should never be executed on the submit nodes of any HPC machine.  If working on the Xanadu cluster, you should use sbatch scriptname after modifying the script for each stage.  Basic editing of all scripts can be performed on the server with tools such as nano, vim, or emacs.  If you are new to Linux, please use <a href="https://bioinformatics.uconn.edu/unix-basics/">this</a> handy guide for the operating system commands.  In this guide, you will be working with common bioinformatic file formats, such as <a href="https://en.wikipedia.org/wiki/FASTA_format">FASTA</a>, <a href="https://en.wikipedia.org/wiki/FASTQ_format">FASTQ</a>, <a href="https://en.wikipedia.org/wiki/SAM_(file_format)">SAM/BAM</a>, and <a href="https://en.wikipedia.org/wiki/General_feature_format">GFF3/GTF</a>. You can learn even more about each file format <a href="https://bioinformatics.uconn.edu/resources-and-events/tutorials/file-formats-tutorial/">here</a>. If you do not have a Xanadu account and are an affiliate of UConn/UCHC, please apply for one <a href="https://bioinformatics.uconn.edu/contact-us/">here</a>.
+This repository is a usable, publicly available tutorial for analyzing differential expression data and creating topological gene networks. All steps have been provided for the UConn CBC Xanadu cluster here with appropriate headers for the Slurm scheduler that can be modified simply to run.  Commands should never be executed on the submit nodes of any HPC machine.  If working on the Xanadu cluster, you should use sbatch scriptname after modifying the script for each stage.  Basic editing of all scripts can be performed on the server with tools such as nano, vim, or emacs.  If you are new to Linux, please use <a href="https://bio Informatics.uconn.edu/unix-basics/">this</a> handy guide for the operating system commands.  In this guide, you will be working with common bio Informatic file formats, such as <a href="https://en.wikipedia.org/wiki/FASTA_format">FASTA</a>, <a href="https://en.wikipedia.org/wiki/FASTQ_format">FASTQ</a>, <a href="https://en.wikipedia.org/wiki/SAM_(file_format)">SAM/BAM</a>, and <a href="https://en.wikipedia.org/wiki/General_feature_format">GFF3/GTF</a>. You can learn even more about each file format <a href="https://bio Informatics.uconn.edu/resources-and-events/tutorials/file-formats-tutorial/">here</a>. If you do not have a Xanadu account and are an affiliate of UConn/UCHC, please apply for one <a href="https://bio Informatics.uconn.edu/contact-us/">here</a>.
 	
 <div id="toc_container">
 <p class="toc_title">Contents</p>
@@ -18,7 +18,7 @@ This repository is a usable, publicly available tutorial for analyzing different
 
 <h2 id="First_Point_Header">Introduction and programs</h2>
 
-In this tutorial, we will be analyzing thale cress (Arabidopsis thaliana) RNA-Seq data from various parts of the plant (roots, stems). Perhaps one of the most common organisms for genetic study, the aggregrate wealth of genetic information of the thale cress makes it ideal for new-comers to learn. Organisms such as this we call "model organisms". You may think of model organisms as a subset of living things which, under the normal conventions of analysis, behave nicely. The data we will be analyzing comes from an experiment in which various cellular RNA was collected from the roots and shoots of a single thale cress. The RNA profiles are archived in the SRA, and metaInformation on each may be viewed through the SRA ID: <a href="https://www.ncbi.nlm.nih.gov/sra?term=SRX1756762">SRR3498212</a>, <a href="https://www.ncbi.nlm.nih.gov/sra/?term=SRR3498213">SRR3498213</a>, <a href="https://www.ncbi.nlm.nih.gov/sra?term=SRX1756765">SRR3498215</a>, <a href="https://www.ncbi.nlm.nih.gov/sra?term=SRX1756766">SRR3498216</a>.
+In this tutorial, we will be analyzing thale cress (Arabidopsis thaliana) RNA-Seq data from various parts of the plant (roots, stems). Perhaps one of the most common organisms for genetic study, the aggregrate wealth of genetic  Information of the thale cress makes it ideal for new-comers to learn. Organisms such as this we call "model organisms". You may think of model organisms as a subset of living things which, under the normal conventions of analysis, behave nicely. The data we will be analyzing comes from an experiment in which various cellular RNA was collected from the roots and shoots of a single thale cress. The RNA profiles are archived in the SRA, and meta Information on each may be viewed through the SRA ID: <a href="https://www.ncbi.nlm.nih.gov/sra?term=SRX1756762">SRR3498212</a>, <a href="https://www.ncbi.nlm.nih.gov/sra/?term=SRR3498213">SRR3498213</a>, <a href="https://www.ncbi.nlm.nih.gov/sra?term=SRX1756765">SRR3498215</a>, <a href="https://www.ncbi.nlm.nih.gov/sra?term=SRX1756766">SRR3498216</a>.
 
 The Single Read Archive, or SRA, is a publicly available database containing read sequences from a variety of experiments. Scientists who would like their read sequences present on the SRA submit a report containing the read sequences, experimental details, and any other accessory meta-data.
 
@@ -52,19 +52,19 @@ quality_control.sh
 
 All of the completed scripts for this tutorial are available for you to submit. However, before submitting, you may want to edit the scripts to include your email!
 
-Before beginning, we need to understand a few aspects of the Xanadu server. When first logging into Xanadu from your local terminal, you will be connected to the submit node. The submit node is the interface with which users on Xanadu may <i>submit</i> their processes to the desired compute nodes, which will run the process. Never, under any circumstance, run processes directly in the submit node. Your process will be killed and all of your work lost! This tutorial will not teach you shell script configuration to submit your tasks on Xanadu. Therefore, before moving on, read and master the topics covered in the <a href="https://bioinformatics.uconn.edu/resources-and-events/tutorials/xanadu/">Xanadu tutorial</a>.
+Before beginning, we need to understand a few aspects of the Xanadu server. When first logging into Xanadu from your local terminal, you will be connected to the submit node. The submit node is the interface with which users on Xanadu may <i>submit</i> their processes to the desired compute nodes, which will run the process. Never, under any circumstance, run processes directly in the submit node. Your process will be killed and all of your work lost! This tutorial will not teach you shell script configuration to submit your tasks on Xanadu. Therefore, before moving on, read and master the topics covered in the <a href="https://bio Informatics.uconn.edu/resources-and-events/tutorials/xanadu/">Xanadu tutorial</a>.
 
 Now that we have covered the introduction and objective of our analysis, we may begin!
 
 <h2 id="Second_Point_Header">Accessing the data using sra-toolkit </h2>
 
-We know that the SRA contain the read sequences and accessory metaInformation from experiments. Rather than downloading experimental data through a browser, we may use the <a href="https://www.ncbi.nlm.nih.gov/books/NBK158900/">sratoolkit</a>'s "fastq-dump" function to directly dump raw read data into the current terminal directory. Let's have a look at this function (it is expected that you have read the Xanadu tutorial, and are familiar with loading modules):
+We know that the SRA contain the read sequences and accessory meta Information from experiments. Rather than downloading experimental data through a browser, we may use the <a href="https://www.ncbi.nlm.nih.gov/books/NBK158900/">sratoolkit</a>'s "fastq-dump" function to directly dump raw read data into the current terminal directory. Let's have a look at this function (it is expected that you have read the Xanadu tutorial, and are familiar with loading modules):
 
 <pre style="color: silver; background: black;">-bash-4.2$ module load sratoolkit
   fastq-dump [options] <path> [<path>...]
   fastq-dump [options] <accession>
 
-Use option --help for more information
+Use option --help for more  Information
 
 fastq-dump : 2.8.2 </pre>
 
@@ -123,7 +123,7 @@ NCAGTTTTGACCAGATAGGTCTCGCTAAGAAGATTGAGAAGATCGGAAGA
 NTCGCTTCGTAAGCGAAAGGCCGCGAGTTCGAAGATCGGAAGAGCACACG
 </pre>
 
-We see that for our first three runs we have information about the sampled read including its length followed by the nucleotide read and then a "+" sign. The "+" sign marks the beginning of the corresponding scores for each nucleotide read for the nucleotide sequence preceding the "+" sign. 
+We see that for our first three runs we have  Information about the sampled read including its length followed by the nucleotide read and then a "+" sign. The "+" sign marks the beginning of the corresponding scores for each nucleotide read for the nucleotide sequence preceding the "+" sign. 
 
 <h2 id="Third_Point_Header">Quality control using sickle</h2>
 
@@ -140,7 +140,7 @@ pe	paired-end sequence trimming
 se	single-end sequence trimming
 
 --help, display this help and exit
---version, output version information and exit</pre>
+--version, output version  Information and exit</pre>
 
 We have single-end sequences. 
 
@@ -157,9 +157,9 @@ We have single-end sequences.
 -x, --no-fiveprime, Don't do five prime trimming.
 -n, --trunc-n, Truncate sequences at position of first N.
 -g, --gzip-output, Output gzipped files.
---quiet, Don't print out any trimming information
+--quiet, Don't print out any trimming  Information
 --help, display this help and exit
---version, output version information and exit</pre>
+--version, output version  Information and exit</pre>
 
 The quality may be any score from 0 to 40. The default of 20 is much too low for a robust analysis. We want to select only reads with a quality of 35 or better. Additionally, the desired length of each read is 50bp. Again, we see that a default of 20 is much too low for analysis confidence. We want to select only reads whose lengths exceed 45bp. Lastly, we must know the scoring type. While the quality type is not listed on the SRA pages, most SRA reads use the "sanger" quality type. Unless explicitly stated, try running sickle using the sanger qualities. If an error is returned, try illumina. If another error is returned, lastly try solexa.
 
@@ -200,7 +200,7 @@ sickle se -f SRR3498216.fastq -t sanger -o trimmed_SRR3498216.fastq -q 35 -l 45
 <br>
 <pre style="color: silver; background: black;">-bash-4.2$ sbatch sickle_run.sh</pre>
 
-It is helpful to see how the quality of the data has changed after using sickle. To do this, we will be using the commandline versions of <a href="https://www.bioinformatics.babraham.ac.uk/projects/fastqc/INSTALL.txt">fastqc</a> and <a href="http://multiqc.info/docs/">MultiQC</a>. These two programs simply create reports of the average quality of our trimmed reads, with some graphs. There is no way to view a --help menu for these programs in the command-line. However, their use is quite simple, we simply run "fastqc <trimmed_fastq>" or "multiqc -f -n trimmed trimmed*". Do not worry too much about the options for MultiQC! Let's write our script:
+It is helpful to see how the quality of the data has changed after using sickle. To do this, we will be using the commandline versions of <a href="https://www.bio Informatics.babraham.ac.uk/projects/fastqc/INSTALL.txt">fastqc</a> and <a href="http://multiqc. Info/docs/">MultiQC</a>. These two programs simply create reports of the average quality of our trimmed reads, with some graphs. There is no way to view a --help menu for these programs in the command-line. However, their use is quite simple, we simply run "fastqc <trimmed_fastq>" or "multiqc -f -n trimmed trimmed*". Do not worry too much about the options for MultiQC! Let's write our script:
 
 <pre style="color: silver; background: black;">-bash-4.2$ nano quality_control.sh
 
@@ -273,18 +273,18 @@ We see that our multiqc file has the same indices as our fastqc files, but is si
 
 
 <h2 id="Fourth_Point_Header">Aligning reads to a genome using hisat2</h2>
-<a href="https://ccb.jhu.edu/software/hisat2/manual.shtml">HISAT2</a> is a fast and sensitive aligner for mapping next generation sequencing reads against a reference genome. HISAT2 requires two arguments: the reads file being mapped and the indexed genome to which those reads are mapped. Typically, the hisat2-build command is used to make a HISAT index file for the genome. It will create a set of files with the suffix .ht2, these files together build the index. What is an index and why is it helpful? Genome indexing is the same as indexing a tome, like an encyclopedia. It is much easier to locate information in the vastness of an encyclopedia when you consult the index, which is ordered in an easily navigatable way with pointers to the location of the information you seek within the encylopedia. Genome indexing is thus the structuring of a genome such that it is ordered in an easily navigatable way with pointers to where we can find whichever gene is being aligned. Let's have a look at how the hisat2-build command works:
+<a href="https://ccb.jhu.edu/software/hisat2/manual.shtml">HISAT2</a> is a fast and sensitive aligner for mapping next generation sequencing reads against a reference genome. HISAT2 requires two arguments: the reads file being mapped and the indexed genome to which those reads are mapped. Typically, the hisat2-build command is used to make a HISAT index file for the genome. It will create a set of files with the suffix .ht2, these files together build the index. What is an index and why is it helpful? Genome indexing is the same as indexing a tome, like an encyclopedia. It is much easier to locate  Information in the vastness of an encyclopedia when you consult the index, which is ordered in an easily navigatable way with pointers to the location of the  Information you seek within the encylopedia. Genome indexing is thus the structuring of a genome such that it is ordered in an easily navigatable way with pointers to where we can find whichever gene is being aligned. Let's have a look at how the hisat2-build command works:
 
 <pre style="color: silver; background: black;">-bash-4.2$ module load hisat2
 -bash-4.2$ hisat2-build
 
 No input sequence or sequence file specified!
-HISAT2 version 2.1.0 by Daehwan Kim (infphilo@gmail.com, http://www.ccb.jhu.edu/people/infphilo)
+HISAT2 version 2.1.0 by Daehwan Kim ( Infphilo@gmail.com, http://www.ccb.jhu.edu/people/ Infphilo)
 <strong>Usage</strong>: hisat2-build [options]* <reference_in> <ht2_index_base>
 	reference_in            comma-separated list of files with ref sequences
 	hisat2_index_base       write ht2 data to files with this dir/basename</strong></pre>
 
-As you can see, we simply enter our reference genome files and the desired prefix for our .ht2 files. Now, fortunately for us, Xanadu has many indexed genomes which we may use. To see if there is a hisat2 <i>Arabidopsis thaliana</i> indexed genome we need to look at the <a href="https://bioinformatics.uconn.edu/databases/">Xanadu databases</a> page. We see that our desired indexed genome is in the location /isg/shared/databases/alignerIndex/plant/Arabidopsis/thaliana/Athaliana_HISAT2/. Now we are ready to align our reads using hisat2 (for hisat2, the script is going to be written first with an explanation of the options after).
+As you can see, we simply enter our reference genome files and the desired prefix for our .ht2 files. Now, fortunately for us, Xanadu has many indexed genomes which we may use. To see if there is a hisat2 <i>Arabidopsis thaliana</i> indexed genome we need to look at the <a href="https://bio Informatics.uconn.edu/databases/">Xanadu databases</a> page. We see that our desired indexed genome is in the location /isg/shared/databases/alignerIndex/plant/Arabidopsis/thaliana/Athaliana_HISAT2/. Now we are ready to align our reads using hisat2 (for hisat2, the script is going to be written first with an explanation of the options after).
 
 <pre style="color: silver; background: black;">nano hisat2_run.sh
 
@@ -409,7 +409,7 @@ bash-4.2$ samtools
 
   -- Editing
      calmd          recalculate MD/NM tags and '=' bases
-     fixmate        fix mate information
+     fixmate        fix mate  Information
      reheader       replace BAM header
      targetcut      cut fosmid regions (for fosmid pool only)
      addreplacerg   adds or replaces RG tags
@@ -524,7 +524,7 @@ Chr1	TAIR10	CDS	3996	4276	.	+	2	Parent=AT1G01010.1,AT1G01010.1-Protein;
 Chr1	TAIR10	exon	4486	4605	.	+	.	Parent=AT1G01010.1
 </pre>
 
-The GFF file is quite self-explanatory. However, it'd be nice if could combine all of the pieces of information from the GFF into something better. For instance, if there are multiple overlapping, but distinct exons from a single gene, we could use that information to determine the isoforms of that gene. Then, we could make a file which gives each isoform its own track (there are other extrapolations to be made, but this is our most relevant example). Luckily for us, we can use the program "gffread" to transform our GFF file into the more useful form just stated, The output of <a href="https://github.com/gpertea/gffread">gffread --help</a> is much too dense for us to go into here, but the necessary options will be explained. Do not run this code! We are compiling this code with various other chunks into one script, be patient!
+The GFF file is quite self-explanatory. However, it'd be nice if could combine all of the pieces of  Information from the GFF into something better. For instance, if there are multiple overlapping, but distinct exons from a single gene, we could use that  Information to determine the isoforms of that gene. Then, we could make a file which gives each isoform its own track (there are other extrapolations to be made, but this is our most relevant example). Luckily for us, we can use the program "gffread" to transform our GFF file into the more useful form just stated, The output of <a href="https://github.com/gpertea/gffread">gffread --help</a> is much too dense for us to go into here, but the necessary options will be explained. Do not run this code! We are compiling this code with various other chunks into one script, be patient!
 
 <pre style="color: silver; background: black;">bash-4.2$ module load gffread
 gffread TAIR10_GFF3_genes.gff -T -o athaliana_TAIR10_genes.gtf</pre>
@@ -556,7 +556,7 @@ ChrM	TAIR10	exon	366086	366700	.	-	.	transcript_id "ATMG01410.1"; gene_id "ATMG0
 ChrM	TAIR10	CDS	366086	366700	.	-	0	transcript_id "ATMG01410.1"; gene_id "ATMG01410"; gene_name "ATMG01410";
 </pre>
 
-We see that whereas in our GFF file we have various untranslated regions included, as well as annotations, the GTF format contains information only on various transcripts for each gene. The "transcript_id" denoter in the last column tells us the gene and its isoform, and everything else about the GTF file is quite apparent!
+We see that whereas in our GFF file we have various untranslated regions included, as well as annotations, the GTF format contains  Information only on various transcripts for each gene. The "transcript_id" denoter in the last column tells us the gene and its isoform, and everything else about the GTF file is quite apparent!
 
 Just as was stated for our conversion from gff to gtf, it would be helpful for us to perform the same operation on our aligned reads. That is, if there are multiple, overlapping but distinct reads from a single gene, we could combine these reads into one transcript isoform. Because we have the gene isoforms in the gtf file, we can re-map each assembled transcript to a gene isoform and then count how many mappings there are per isoform. This, in effect, allows us to quantify the expression rates of each isoform. We will be using the program <a href="http://ccb.jhu.edu/software/stringtie/index.shtml?t=manual">StringTie</a> to assemble the transcripts for each sample. StringTie requires three input arguments: the BAM alignment file, the genomic GTF file, and the desired output GTF filename. Thus, our code will look like (do not run this!):
 
@@ -585,7 +585,7 @@ Chr1	StringTie	exon	50075	50337	1000	-	.	gene_id "STRG.3"; transcript_id "STRG.3
 Chr1	StringTie	exon	50419	50631	1000	-	.	gene_id "STRG.3"; transcript_id "STRG.3.1"; exon_number "2"; reference_id "AT1G01100.2"; ref_gene_id "AT1G01100"; ref_gene_name "AT1G01100"; cov "9.487524";
 </pre>
 
-While this is certainly confusing, we can still understand it. To start each row we have the chromosome for each sequence. The second column is the software used to assemble the transcript, in our case StringTie. The third column is the sequence type, either a transcript or an exon. The next two columns are the start and end bp of the feature (assuming the chromosome starts at bp 1), followed by another column which is the score. The column after the score is either "+" or "-" for forward strand and reverse strand, respectively. Our last two columns are the frame ("." means frame not determined) and the feature metaInformation. 
+While this is certainly confusing, we can still understand it. To start each row we have the chromosome for each sequence. The second column is the software used to assemble the transcript, in our case StringTie. The third column is the sequence type, either a transcript or an exon. The next two columns are the start and end bp of the feature (assuming the chromosome starts at bp 1), followed by another column which is the score. The column after the score is either "+" or "-" for forward strand and reverse strand, respectively. Our last two columns are the frame ("." means frame not determined) and the feature meta Information. 
 
 You may be wondering about the last three columns which are not standard in GTF. The column "cov" is simply the covariance of the gene across samples (if the gene is highly or lowly expressed in both samples the covariance will be high, if it is highly expressed in one sample and lowly expressed in another sample, the covariance will be low). The FPKM column is the fragment per kilobase million value. Simply put, this is the number of times the specific feature was counted divided by how many counts there were for all features combined, in millions. That number is then divided by the length of the feature in kilobases. The reason for this being that longer features should have higher counts. For instance, when we split our mRNA in sequences of 50 or less for reading, one 5000 bp transcript will appear as 100 counts, and one 500 bp transcript will appear as 10 counts. Now, let's divide each count by the transcript length in kilobases: we have 20 as the value for the 5000 bp sequence (100/(5000/1000)) and 20 as the value for the 500 bp sequence (10/(500/1000)! Now our quantification matches the actual expression profile -- that is, both features were transcribed the same amount.
 
@@ -678,7 +678,7 @@ Intron chain level:   100.0     |    99.5    |
 ^X Exit                           ^J Justify                        ^W Where Is                       ^V Next Page                      ^U UnCut Text                     ^T To Spell
 </pre>
 
-The information here is quite apparent.
+The  Information here is quite apparent.
 
 <pre style="color: silver; background: black;">-bash-4.2$ head merged.stringtie_merged.gtf.refmap
 ref_gene_id	ref_id	class_code	qry_id_list
@@ -708,7 +708,7 @@ AT1G01183	AT1G01183.1	=	AT1G01183	AT1G01183.1	1	0.000000	0.000000	0.000000	101	A
 AT1G01225	AT1G01225.1	=	AT1G01225	AT1G01225.1	2	0.000000	0.000000	0.000000	1025	AT1G01225.1	1025
 </pre>
 
-All of the information in the .tmap file may be readily understood now, knowing that "len" and "ref_match_len" are the sequence lengths and reference lengths, respectively.
+All of the  Information in the .tmap file may be readily understood now, knowing that "len" and "ref_match_len" are the sequence lengths and reference lengths, respectively.
 
 Lastly,
 <pre style="color: silver; background: black;">-bash-4.2$ head merged.tracking
@@ -858,7 +858,7 @@ samplePattern		regular expression identifying the subdirectories of\ dataDir con
 bamfiles		optional vector of file paths to read alignment files for each sample. If provided, make sure to sort properly
 			(e.g., in the same order as samples). Default NULL.
 pData			optional data.frame with rows corresponding to samples and columns corresponding to phenotypic variables.
-verbose			if TRUE, print status messages and timing information as the object is constructed.
+verbose			if TRUE, print status messages and timing  Information as the object is constructed.
 meas			character vector containing either "all" or one or more of: "rcount", "ucount", "mrcount", "cov", "cov_sd", 
 			"mcov", "mcov_sd", or "FPKM". The resulting ballgown object will only contain the specified expression 	
 			measurements, for the appropriate features. See vignette for which expression measurements are available for 
@@ -1126,7 +1126,7 @@ head(thale_cress_mart)
 Our mart is in the <a href="http://adv-r.had.co.nz/S4.html">S4</a> class and not readable right now. We can process it by using the "getBM" function:
 <pre style="color: silver; background: black;">??biomaRt::getBM
 
-Retrieves information from the BioMart database
+Retrieves  Information from the BioMart database
 
 <strong>Description</strong>
 
@@ -1206,7 +1206,7 @@ The default descriptions are certainly underwhelming. Let's see if there are any
 1042         source_description Variant source description          snp
 1080                description           Gene description    sequences</strong></pre>
 
-Using the other descriptions will take much, much longer as the information is extracted from the appropriate databases via internet connection. For this tutorial we will be sticking with our un-impressive descriptions. However, you may choose the description best for you and your resesarch. Before we move on to annotating, let's have a look at the filters:
+Using the other descriptions will take much, much longer as the  Information is extracted from the appropriate databases via internet connection. For this tutorial we will be sticking with our un-impressive descriptions. However, you may choose the description best for you and your resesarch. Before we move on to annotating, let's have a look at the filters:
 
 <pre style="color: silver; background: black;">head(listFilters(thale_cress_mart))
 <strong>                name                            description
@@ -1316,7 +1316,7 @@ A-ha. We see the mismatch in dimension length is due to some genes having differ
 [225] "AT1G19010" "AT1G19010" "AT1G52400" "AT1G52400" "AT1G52400" "AT5G10110" "AT1G63360" "AT1G63360"
 [233] "AT3G51870"</strong></pre>
 
-Not a single one of the "MSTRG" sequences has been annotated. It is time we address what the "MSTRG" sequences are. You may find out by reading <a href="https://github.com/gpertea/stringtie/issues/95">this</a> FAQ. Please read the link to understand why we <i>typically</i> cannot use the "MSTRG" sequences in the differential expression analysis, and most certainly not in annotations. In actuality, because each MSTRG represents the isoform of a specific gene, but its ID is different across samples, we would expect <i>all</i> of the MSTRG isoforms to come up as differentially expressed, as the computer cannot find one in any of the other samples! We avoid this by running StringTie's "-eb" options to map all of our assembled transcript reads back to the alignment GTF we created, thereby ensuring that all of our final alignment MSTRG ids match. We do not care about the MSTRG in annotation because the names are randomized! Our assembled transcript reads in each sample are actually <i>complete</i> transcripts, which are then matched to our assembled reference genome. Although weird, some assembled isoforms may actually map to one gene while its individual reads may have mapped to two or more! Therefore, we know that through our procedure forcing consistent nomenclature, we have more confidence that our actual gene counts and differential expression analyses are more robust (which is why this process should be used with highly similar samples, i.e., samples from different parts of one organism), even if we cannot use that information in our annotations.
+Not a single one of the "MSTRG" sequences has been annotated. It is time we address what the "MSTRG" sequences are. You may find out by reading <a href="https://github.com/gpertea/stringtie/issues/95">this</a> FAQ. Please read the link to understand why we <i>typically</i> cannot use the "MSTRG" sequences in the differential expression analysis, and most certainly not in annotations. In actuality, because each MSTRG represents the isoform of a specific gene, but its ID is different across samples, we would expect <i>all</i> of the MSTRG isoforms to come up as differentially expressed, as the computer cannot find one in any of the other samples! We avoid this by running StringTie's "-eb" options to map all of our assembled transcript reads back to the alignment GTF we created, thereby ensuring that all of our final alignment MSTRG ids match. We do not care about the MSTRG in annotation because the names are randomized! Our assembled transcript reads in each sample are actually <i>complete</i> transcripts, which are then matched to our assembled reference genome. Although weird, some assembled isoforms may actually map to one gene while its individual reads may have mapped to two or more! Therefore, we know that through our procedure forcing consistent nomenclature, we have more confidence that our actual gene counts and differential expression analyses are more robust (which is why this process should be used with highly similar samples, i.e., samples from different parts of one organism), even if we cannot use that  Information in our annotations.
 
 Lastly, let's remove the MSTRG sequences from our gene results object and write our files:
 
@@ -1361,7 +1361,7 @@ min(fpkm)
 max(fpkm)
 <strong>1179157</strong>
 </pre>
-Due to the scaling, we cannot truly see the distribution. However, what we <i>can</i> do is to transform the data such that the variance is not so staggering, allowing us to see better. There are a few rules for this, all of the data must be transformed in a consistent and reversible manner, after transformation no data may have a negative value, and all data with a value of 0 must also be 0 after transformation. The reason for the second and third rules is more epistemological. For us, if a gene has an FPKM of 0, then for that sample the gene is unexpressed. Should we transform the data and that particular gene's FPKM is now above 0, we are fundamentally changing the nature of that sample -- i.e., we are now saying it is expresesing a gene it actually is not! Additionally, there is no such thing as negative expression, so there is no physical reality where we will have an FPKM beneath 0. With these three rules, we see that taking the log of all our data will prevent negative values, be consistent and reversible, and scale down our variance. However, log(0) = Inf! We have broken a cardinal rule (oddly enough, the fact that it is infinity is not a rule-breaker, but rather that it is <b>negative</b> infinity! Seeing this, we can simply add 1 to our data before log transforming, log(0+1) = 0. Now we have fulfilled all three rules.
+Due to the scaling, we cannot truly see the distribution. However, what we <i>can</i> do is to transform the data such that the variance is not so staggering, allowing us to see better. There are a few rules for this, all of the data must be transformed in a consistent and reversible manner, after transformation no data may have a negative value, and all data with a value of 0 must also be 0 after transformation. The reason for the second and third rules is more epistemological. For us, if a gene has an FPKM of 0, then for that sample the gene is unexpressed. Should we transform the data and that particular gene's FPKM is now above 0, we are fundamentally changing the nature of that sample -- i.e., we are now saying it is expresesing a gene it actually is not! Additionally, there is no such thing as negative expression, so there is no physical reality where we will have an FPKM beneath 0. With these three rules, we see that taking the log of all our data will prevent negative values, be consistent and reversible, and scale down our variance. However, log(0) =  Inf! We have broken a cardinal rule (oddly enough, the fact that it is  Infinity is not a rule-breaker, but rather that it is <b>negative</b>  Infinity! Seeing this, we can simply add 1 to our data before log transforming, log(0+1) = 0. Now we have fulfilled all three rules.
 
 <pre style="color: silver; background: black;">
 fpkm = log2(fpkm + 1)
@@ -1469,7 +1469,7 @@ FPKM.athaliana_shoot_1  0.1454597 -0.045779068
 FPKM.athaliana_shoot_2  0.1000175  0.055096980</strong>
 
 </pre>
-For this next step it is assumed that you are familiar with plotting in R. If not you may look <a href="https://bioinformatics.uconn.edu/introduction-to-r/">here</a>.
+For this next step it is assumed that you are familiar with plotting in R. If not you may look <a href="https://bio Informatics.uconn.edu/introduction-to-r/">here</a>.
 
 <pre style="color: silver; background: black;">
 plot.new()
@@ -1482,7 +1482,7 @@ text(pca[,1],pca[,2],pos=2,short_names, col=c("red", "red", "blue", "blue"))</pr
 
 <h2 id="Seventh_Point_Header">Topological networking using cytoscape</h2>
 
-<a href="https://github.com/miriamposner/cytoscape_tutorials">Cytoscape</a> is a desktop program which creates visual topological networks of data. The only requirement to create a topological network in Cytoscape is to have an "edge list". An edge list is a two-column list which comprises two separate types of data. Each row of the edge list is a single piece of information (so both columns combine to form a piece of infromation for the row) that Cytoscape uses. To begin, download and install Cytoscape. Now, let's go over the two columns of an edge list:
+<a href="https://github.com/miriamposner/cytoscape_tutorials">Cytoscape</a> is a desktop program which creates visual topological networks of data. The only requirement to create a topological network in Cytoscape is to have an "edge list". An edge list is a two-column list which comprises two separate types of data. Each row of the edge list is a single piece of  Information (so both columns combine to form a piece of  Infromation for the row) that Cytoscape uses. To begin, download and install Cytoscape. Now, let's go over the two columns of an edge list:
 
 The two columns of an edge list represent the "sources" and "nodes". You may instead think of the two columns representing an object and its group. For instance, the edge list:
 
@@ -1493,7 +1493,7 @@ The two columns of an edge list represent the "sources" and "nodes". You may ins
 	D	3
 	A	4
 	C	3</pre>
-means that object A is in both groups 1 and 4, object B is in only group 1, object C is in groups 3 and 4, and so forth. We could then say that our sources are the objects, and our nodes are the groups to which each object belongs. To make our topological network we simply put one point for each object and one point for each group on a piece of paper and draw arrows going from each object-point to each group-point. If two objects are pointing to the same group, we place those objects closer to the group. If an object is part of two or more groups, that object will have two or more arrows pointing to each distinct group to which it belong. The cardinal rule is that no object may have two arrows pointing to the same group (that is, the set for that group is pairwise disjoint). Now we need to begin thinking about our differential expression data. We could group the genes with the phenotype which expresses them most. . .but that would leave all of our genes (sources) flowing to only four sinks (nodes). That certainly does not communicate much. However, we have our differential gene expression results written into a csv, complete with the fold-change, or percent increase, between phenotypes. We could group our genes according to their fold-changes. However, should we do this, each of our sources would flow only to one sink, and we'd have no information about the flow between sinks. What we <i>can</i> do, however, is to perform a variety of grouping exercises, successively grouping our results into larger and larger groups. The initial grouping will be the most specific, composed of the most sinks. However, the second grouping will be less specific, consisting of fewer sinks but the same number of sources. Therefore, some of the sinks in the initial grouping have converged. We can now determine which sinks have converged and conncet those sinks in the first grouping. We can repeat this until it is of no more use to us. 
+means that object A is in both groups 1 and 4, object B is in only group 1, object C is in groups 3 and 4, and so forth. We could then say that our sources are the objects, and our nodes are the groups to which each object belongs. To make our topological network we simply put one point for each object and one point for each group on a piece of paper and draw arrows going from each object-point to each group-point. If two objects are pointing to the same group, we place those objects closer to the group. If an object is part of two or more groups, that object will have two or more arrows pointing to each distinct group to which it belong. The cardinal rule is that no object may have two arrows pointing to the same group (that is, the set for that group is pairwise disjoint). Now we need to begin thinking about our differential expression data. We could group the genes with the phenotype which expresses them most. . .but that would leave all of our genes (sources) flowing to only four sinks (nodes). That certainly does not communicate much. However, we have our differential gene expression results written into a csv, complete with the fold-change, or percent increase, between phenotypes. We could group our genes according to their fold-changes. However, should we do this, each of our sources would flow only to one sink, and we'd have no  Information about the flow between sinks. What we <i>can</i> do, however, is to perform a variety of grouping exercises, successively grouping our results into larger and larger groups. The initial grouping will be the most specific, composed of the most sinks. However, the second grouping will be less specific, consisting of fewer sinks but the same number of sources. Therefore, some of the sinks in the initial grouping have converged. We can now determine which sinks have converged and conncet those sinks in the first grouping. We can repeat this until it is of no more use to us. 
 
 To achieve this, we can create a series of family trees, or <a href="https://en.wikipedia.org/wiki/Dendrogram">dendrograms</a>. You have most likely encountered many dendrograms before in an evolutionary biology course. An important note about dendrograms is that only the <b>height</b> of the tree matters. It does not matter, laterally, how close together any two leaves are. Leaves and nodes which are separated by a small height are more closely related than leaves and nodes which are separated by greater heights, regardless of the lateral distance needed to reach one or the other. This will come in handy. We can create a dendrogram of our genes based on their fold changes and then create our groups by taking at first each node and its closer neighbor. Afterwards, we can create a second dendogram of our genes based on their changes and create our groups by taking each node and its two closest neighbors. The second tree will be less specific, and each group will be a combination of two groups frmo the first tree. We continue this process until it is of no use, and then create our edge-list as needed. To do this, we will be back in R, this time using the package "RFLPtools", which allows us to write our groups into a plain-text document. Let's load R and our gene results:
 	
@@ -1618,7 +1618,7 @@ Currently our data is not in a very presentable format. Let's go over to the Sty
 
 Play around and familiarize yourself with Cytoscape. It is a very handy tool!
 
-We see we have one large central network which connects to two small networks. Lastly, we have a peripheral network which seems to be distinct. There simply is too much going on here for us to extract much meaningful information. Let's pare down our information. Instead of creating a network based on genes, let's instead create a network based on the groups. That is, should a gene appear in three distinct groups, 1, 2, 3, we could create a network simply with the nodes 1, 2, 3. We have approximately 200 genes, but only 21 groups! We know all the groups to which each gene belongs, so no information will be lost. Let's combine all of our groupings from the clusters of 3, 6, and 12:
+We see we have one large central network which connects to two small networks. Lastly, we have a peripheral network which seems to be distinct. There simply is too much going on here for us to extract much meaningful  Information. Let's pare down our  Information. Instead of creating a network based on genes, let's instead create a network based on the groups. That is, should a gene appear in three distinct groups, 1, 2, 3, we could create a network simply with the nodes 1, 2, 3. We have approximately 200 genes, but only 21 groups! We know all the groups to which each gene belongs, so no  Information will be lost. Let's combine all of our groupings from the clusters of 3, 6, and 12:
 
 <pre style="color: silver; background: black;">clusters_of_3 = read.csv("clusters_of_3.csv",header=F)
 clusters_of_6 = read.csv("clusters_of_6.csv",header=F)
@@ -1668,7 +1668,7 @@ set_of_uniques
 171            26            84             11
 173            26            28             12</strong></pre>
 
-Now, we know that each cluster from our clusters of 3 will have a mate in the clusters of 6 and 12. We also know this for clusters of 6 and so on. Because there are two sets containing mates for each cluster, let's create a matrix which contains each cluster vector (so clusters of 3 groupings) twice as the first column, with the mates in the second column (i.e., for the first instance of clusters of 3 in the first column the second column will have the mates from clusters of 6, in the second instance of clusters of 3 in the first column, the second column will have the mates from clusters of 12). Then let's create a complete edge list combining this information for all three clusters:
+Now, we know that each cluster from our clusters of 3 will have a mate in the clusters of 6 and 12. We also know this for clusters of 6 and so on. Because there are two sets containing mates for each cluster, let's create a matrix which contains each cluster vector (so clusters of 3 groupings) twice as the first column, with the mates in the second column (i.e., for the first instance of clusters of 3 in the first column the second column will have the mates from clusters of 6, in the second instance of clusters of 3 in the first column, the second column will have the mates from clusters of 12). Then let's create a complete edge list combining this  Information for all three clusters:
 
 <pre style="color: silver; background: black;">clusters_of_3_network = c(set_of_uniques[,1],set_of_uniques[,1])
 clusters_of_6_network = c(set_of_uniques[,2],set_of_uniques[,2])
@@ -1696,7 +1696,7 @@ write.csv(complete_edge_list,file = "complete_edge_list.csv",row.names=F)</pre>
 Let's now visualize this edge list in Cytoscape. The end result should look something like this:
 <img src="complete_edge_list.csv.png">
 
-While this is nice, we would like some computational proof of which groups have the highest connectivity and the degree of relationships among groups. We will term "connectivity" for this tutorial simply as the number of neighbors a group has. We will term "degree of relationship" as the number of neighbors through which one group must go before reaching the other group + 1. Looking at our Cytoscape output we see that for connected groups the greatest degree of relationships is 2. For groups in separate clusters we will call their degree of relationship as Inf.
+While this is nice, we would like some computational proof of which groups have the highest connectivity and the degree of relationships among groups. We will term "connectivity" for this tutorial simply as the number of neighbors a group has. We will term "degree of relationship" as the number of neighbors through which one group must go before reaching the other group + 1. Looking at our Cytoscape output we see that for connected groups the greatest degree of relationships is 2. For groups in separate clusters we will call their degree of relationship as  Inf.
 
 If you click on the export button in Cytoscape, we will have the option of exporting the network. Click on that and export the network as a .xml file. 
 
@@ -1714,7 +1714,7 @@ head(interaction_list)
 5  4 11 (interacts with) 26
 6  5 10 (interacts with) 28</strong></pre>
 
-We see that all of the information has been stored in the second column and the first column is simply an index. Let's keep only the second column:
+We see that all of the  Information has been stored in the second column and the first column is simply an index. Let's keep only the second column:
 
 <pre style="color: silver; background: black;">> interaction_list=interaction_list[,2]
 interaction_list
@@ -1787,7 +1787,7 @@ sinks
 [37] "9"   "4"   " 26" " 26" " 26" " 26" " 12" " 11" " 10" "9"   "8"   "4"   " 28" " 84" " 28" " 28" " 70" " 28"
 [55] "6"   "3"   "2"   "1"   " 13" " 13" " 13" " 13" "7"   "6"   "3"   "2"   "1"   " 56" " 14" " 14" " 14" " 14"</strong></pre>
 
-If we compare element 55 across all of our vectors, we see that we have the correct format and information. Now, let's create our sources and sinks matrix. A word of note, these are not truly sources and sinks! They connect in both directions. Because of this, we will want to make our sources and sinks matrix, a sinks and sources matrix, and then adjoin the two together by rows:
+If we compare element 55 across all of our vectors, we see that we have the correct format and  Information. Now, let's create our sources and sinks matrix. A word of note, these are not truly sources and sinks! They connect in both directions. Because of this, we will want to make our sources and sinks matrix, a sinks and sources matrix, and then adjoin the two together by rows:
 
 <pre style="color: silver; background: black;">sources_and_sinks = matrix(0,nrow=72,ncol=2)
 sinks_and_sources = matrix(0, nrow=72, ncol=2)
@@ -1865,7 +1865,7 @@ degree_of_relation_matrix
 70 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0
 84 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0</strong></pre>
 
-We know a few things which will help us fill in this matrix. Remember that the degree of relationship is simply the number of neighbors through which one group must go to get to the other + 1. That means the most closely related groups will have a degree of 1. What about each group with itself? As a conventional rule, we will define each group as having a 0th degree of relationship with itself. Great, we now know that groups that are connected with no neighbors in between necessary will have a degree of 1, with one neighbor between necessary 2, and so forth. We are lucky in that we know from our Cytoscape output that our highest degree of relationship is 2. Our final convention is that should two groups be disconnected we give them a degree of relationship of infinity (the higher the degree, the less connected the groups are). While most of this code is straight forward, let's take a minute to go over how we will determine those with a second degree of relationship. Suppose we have groups A and B which has a second degree of relatioship. We know that A and B must share a neighbor. But how do we determine that? Well, if we take the neighbors of A's neighbors, and the neighbors of B's neighbors, we know that at least one of A's neighbors' neighbors and B's neighbors' neighbors will be the same. Therefore, if the length of the intersection of A's neighbors' neighbors and B's neighbors' neighbors is 1 or above, A and B have a second degree relationship! While that is all very confusing, I invite you to read it over a few times until the sense is apparent. Because we know that our highest degree of relationship is 2, if the intersection described prior is the empty set then A and B are not connected, and have a degree of relationship of infinity. Let's now write our code:
+We know a few things which will help us fill in this matrix. Remember that the degree of relationship is simply the number of neighbors through which one group must go to get to the other + 1. That means the most closely related groups will have a degree of 1. What about each group with itself? As a conventional rule, we will define each group as having a 0th degree of relationship with itself. Great, we now know that groups that are connected with no neighbors in between necessary will have a degree of 1, with one neighbor between necessary 2, and so forth. We are lucky in that we know from our Cytoscape output that our highest degree of relationship is 2. Our final convention is that should two groups be disconnected we give them a degree of relationship of  Infinity (the higher the degree, the less connected the groups are). While most of this code is straight forward, let's take a minute to go over how we will determine those with a second degree of relationship. Suppose we have groups A and B which has a second degree of relatioship. We know that A and B must share a neighbor. But how do we determine that? Well, if we take the neighbors of A's neighbors, and the neighbors of B's neighbors, we know that at least one of A's neighbors' neighbors and B's neighbors' neighbors will be the same. Therefore, if the length of the intersection of A's neighbors' neighbors and B's neighbors' neighbors is 1 or above, A and B have a second degree relationship! While that is all very confusing, I invite you to read it over a few times until the sense is apparent. Because we know that our highest degree of relationship is 2, if the intersection described prior is the empty set then A and B are not connected, and have a degree of relationship of  Infinity. Let's now write our code:
 
 <pre style="color: silver; background: black;">for (i in 1:nrow(degree_of_relation_matrix)){
 for (j in 1:ncol(degree_of_relation_matrix)){
@@ -1892,7 +1892,7 @@ extended_sink_interaction = unique_interactions[unique_interactions$sink == sink
 if (length(intersect(extended_source_interaction[,2],extended_sink_interaction[,1]))>=1){
 degree_of_relation_matrix[i,j] = 2
 }
-else{degree_of_relation_matrix[i,j] = Inf
+else{degree_of_relation_matrix[i,j] =  Inf
 }
 }
 }
@@ -1902,27 +1902,27 @@ else{degree_of_relation_matrix[i,j] = Inf
 degree_of_relation_matrix
 <strong>
       1    2    3    4    5    6    7    8    9   10   11   12   13   14   26   28   39   42   56   70   84
-1     0    2    2 Inf Inf    2    2 Inf Inf Inf Inf Inf    1    1 Inf Inf Inf Inf    2 Inf Inf
-2     2    0    2 Inf Inf    2    2 Inf Inf Inf Inf Inf    1    1 Inf Inf Inf Inf    2 Inf Inf
-3     2    2    0 Inf Inf    2    2 Inf Inf Inf Inf Inf    1    1 Inf Inf Inf Inf    2 Inf Inf
-4  Inf Inf Inf    0 Inf Inf Inf    2    2    2    2    2 Inf Inf    1    1 Inf Inf Inf    2    2
-5  Inf Inf Inf Inf    0 Inf Inf Inf Inf Inf Inf Inf Inf Inf Inf Inf    1    1 Inf Inf Inf
-6     2    2    2 Inf Inf    0    2 Inf Inf Inf Inf Inf    1    1 Inf Inf Inf Inf    2 Inf Inf
-7     2    2    2 Inf Inf    2    0 Inf Inf Inf Inf Inf    1    2 Inf Inf Inf Inf    1 Inf Inf
-8  Inf Inf Inf    2 Inf Inf Inf    0    2    2    2    2 Inf Inf    1    2 Inf Inf Inf    1    2
-9  Inf Inf Inf    2 Inf Inf Inf    2    0    2    2    2 Inf Inf    1    1 Inf Inf Inf    2    2
-10 Inf Inf Inf    2 Inf Inf Inf    2    2    0    2    2 Inf Inf    1    1 Inf Inf Inf    2    2
-11 Inf Inf Inf    2 Inf Inf Inf    2    2    2    0    2 Inf Inf    1    2 Inf Inf Inf    2    1
-12 Inf Inf Inf    2 Inf Inf Inf    2    2    2    2    0 Inf Inf    1    1 Inf Inf Inf    2    2
-13    1    1    1 Inf Inf    1    1 Inf Inf Inf Inf Inf    0    1 Inf Inf Inf Inf    1 Inf Inf
-14    1    1    1 Inf Inf    1    2 Inf Inf Inf Inf Inf    1    0 Inf Inf Inf Inf    2 Inf Inf
-26 Inf Inf Inf    1 Inf Inf Inf    1    1    1    1    1 Inf Inf    0    1 Inf Inf Inf    1    1
-28 Inf Inf Inf    1 Inf Inf Inf    2    1    1    2    1 Inf Inf    1    0 Inf Inf Inf    2    2
-39 Inf Inf Inf Inf    1 Inf Inf Inf Inf Inf Inf Inf Inf Inf Inf Inf    0    1 Inf Inf Inf
-42 Inf Inf Inf Inf    1 Inf Inf Inf Inf Inf Inf Inf Inf Inf Inf Inf    1    0 Inf Inf Inf
-56    2    2    2 Inf Inf    2    1 Inf Inf Inf Inf Inf    1    2 Inf Inf Inf Inf    0 Inf Inf
-70 Inf Inf Inf    2 Inf Inf Inf    1    2    2    2    2 Inf Inf    1    2 Inf Inf Inf    0    2
-84 Inf Inf Inf    2 Inf Inf Inf    2    2    2    1    2 Inf Inf    1    2 Inf Inf Inf    2    0</strong>
+1     0    2    2  Inf  Inf    2    2  Inf  Inf  Inf  Inf  Inf    1    1  Inf  Inf  Inf  Inf    2  Inf  Inf
+2     2    0    2  Inf  Inf    2    2  Inf  Inf  Inf  Inf  Inf    1    1  Inf  Inf  Inf  Inf    2  Inf  Inf
+3     2    2    0  Inf  Inf    2    2  Inf  Inf  Inf  Inf  Inf    1    1  Inf  Inf  Inf  Inf    2  Inf  Inf
+4   Inf  Inf  Inf    0  Inf  Inf  Inf    2    2    2    2    2  Inf  Inf    1    1  Inf  Inf  Inf    2    2
+5   Inf  Inf  Inf  Inf    0  Inf  Inf  Inf  Inf  Inf  Inf  Inf  Inf  Inf  Inf  Inf    1    1  Inf  Inf  Inf
+6     2    2    2  Inf  Inf    0    2  Inf  Inf  Inf  Inf  Inf    1    1  Inf  Inf  Inf  Inf    2  Inf  Inf
+7     2    2    2  Inf  Inf    2    0  Inf  Inf  Inf  Inf  Inf    1    2  Inf  Inf  Inf  Inf    1  Inf  Inf
+8   Inf  Inf  Inf    2  Inf  Inf  Inf    0    2    2    2    2  Inf  Inf    1    2  Inf  Inf  Inf    1    2
+9   Inf  Inf  Inf    2  Inf  Inf  Inf    2    0    2    2    2  Inf  Inf    1    1  Inf  Inf  Inf    2    2
+10  Inf  Inf  Inf    2  Inf  Inf  Inf    2    2    0    2    2  Inf  Inf    1    1  Inf  Inf  Inf    2    2
+11  Inf  Inf  Inf    2  Inf  Inf  Inf    2    2    2    0    2  Inf  Inf    1    2  Inf  Inf  Inf    2    1
+12  Inf  Inf  Inf    2  Inf  Inf  Inf    2    2    2    2    0  Inf  Inf    1    1  Inf  Inf  Inf    2    2
+13    1    1    1  Inf  Inf    1    1  Inf  Inf  Inf  Inf  Inf    0    1  Inf  Inf  Inf  Inf    1  Inf  Inf
+14    1    1    1  Inf  Inf    1    2  Inf  Inf  Inf  Inf  Inf    1    0  Inf  Inf  Inf  Inf    2  Inf  Inf
+26  Inf  Inf  Inf    1  Inf  Inf  Inf    1    1    1    1    1  Inf  Inf    0    1  Inf  Inf  Inf    1    1
+28  Inf  Inf  Inf    1  Inf  Inf  Inf    2    1    1    2    1  Inf  Inf    1    0  Inf  Inf  Inf    2    2
+39  Inf  Inf  Inf  Inf    1  Inf  Inf  Inf  Inf  Inf  Inf  Inf  Inf  Inf  Inf  Inf    0    1  Inf  Inf  Inf
+42  Inf  Inf  Inf  Inf    1  Inf  Inf  Inf  Inf  Inf  Inf  Inf  Inf  Inf  Inf  Inf    1    0  Inf  Inf  Inf
+56    2    2    2  Inf  Inf    2    1  Inf  Inf  Inf  Inf  Inf    1    2  Inf  Inf  Inf  Inf    0  Inf  Inf
+70  Inf  Inf  Inf    2  Inf  Inf  Inf    1    2    2    2    2  Inf  Inf    1    2  Inf  Inf  Inf    0    2
+84  Inf  Inf  Inf    2  Inf  Inf  Inf    2    2    2    1    2  Inf  Inf    1    2  Inf  Inf  Inf    2    0</strong>
 
 write.csv(file="degree_of_relation_matrix.csv",degree_of_relation_matrix,row.names=T)</pre>
 
@@ -1968,6 +1968,6 @@ Aligned the experimental data to the reference genome, allowing us to determine 
 Determined and quantified the gene isoforms present in each sample
 Determined which gene isoforms had different general expression patterns between phenotypes
 Created visual gene topologial networks
-Extracted computational information about those networks</pre>
+Extracted computational  Information about those networks</pre>
 
-While our work may have seemed completed after creating the visualization, the picture itself is not of much use to other scientists! However, all of the csv files we created are. A scientist may have an interest in one particular gene we studied. With our differential expression results output she will be able to determine how the gene's behavior varied according to phenotype. Perhaps she wants to begin investigating if one gene codes for a transcription factor of another. She can consult our gene complete clusters file and see if the two genes belong to the same cluster (as the activation of one will activate the other!). She may be interested in the total behavior of one cluster in activating or suppressing another cluster. She can determine her base and target clusters by locating the genes in our complete clusters file, extract all genes from those clusters, and then explore how downstream each cluster's effect may be by utilizing the degree of relationship csv. Bioinformatics is a collaborative field. We are always dependent on the work of others to solve the questions about which we are the most passionate. Because of this, it is important to always dig deep in your own analysis, and to create as readable and handy data as you can. Not only because you do not want another scientist to be lost in your files, but they must be readable by a computer! Sometimes, it may have felt like we were going down the rabbit hole in this tutorial. However, the information we compiled is easy and immediately helpful for fellow scientists to use. Congratulations on finishing this tutorial successfully!
+While our work may have seemed completed after creating the visualization, the picture itself is not of much use to other scientists! However, all of the csv files we created are. A scientist may have an interest in one particular gene we studied. With our differential expression results output she will be able to determine how the gene's behavior varied according to phenotype. Perhaps she wants to begin investigating if one gene codes for a transcription factor of another. She can consult our gene complete clusters file and see if the two genes belong to the same cluster (as the activation of one will activate the other!). She may be interested in the total behavior of one cluster in activating or suppressing another cluster. She can determine her base and target clusters by locating the genes in our complete clusters file, extract all genes from those clusters, and then explore how downstream each cluster's effect may be by utilizing the degree of relationship csv. Bio Informatics is a collaborative field. We are always dependent on the work of others to solve the questions about which we are the most passionate. Because of this, it is important to always dig deep in your own analysis, and to create as readable and handy data as you can. Not only because you do not want another scientist to be lost in your files, but they must be readable by a computer! Sometimes, it may have felt like we were going down the rabbit hole in this tutorial. However, the  Information we compiled is easy and immediately helpful for fellow scientists to use. Congratulations on finishing this tutorial successfully!
