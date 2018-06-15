@@ -46,6 +46,8 @@ cytoscape4.png              trimmed_SRR3498212_fastqc.html
 cytoscape5.png              trimmed_SRR3498213_fastqc.html
 data_dump.sh                trimmed_SRR3498215_fastqc.html
 hisat2_run.sh               trimmed_SRR3498216_fastqc.html
+pcaplot_for_all_libraries.png
+Rplot.png
 quality_control.sh</strong>
 </pre>
 
