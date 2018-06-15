@@ -11,8 +11,8 @@ This repository is a usable, publicly available tutorial for analyzing different
 <li><a href="#Fourth_Point_Header">4 Aligning reads to a genome using hisat2</a></li>
 <li><a href="#Fifth_Point_Header">5 Transcript assembly and quantification with StringTie</a></li>
 <li><a href="#Sixth_Point_Header">6 Differential expression analysis using ballgown</a></li>
-<li><a href="#Seventh_Point_Header">Topological networking using cytoscape</a></li>
- <li><a href="#Integration">8 Integrating the DE Results with the Annotation Results</a></li>
+<li><a href="#Seventh_Point_Header">7 Topological networking using cytoscape</a></li>
+ <li><a href="#Eighth_Point_Header">8 Conclusion</a></li>
 <li><a href="#Citation">Citations</a></li>
 </ul>
 </div>
@@ -1252,4 +1252,355 @@ Currently our data is not in a very presentable format. Let's go over to the Sty
 
 You can play around without as you like, my final result looked like this:
 
-We see we have one large central network which connects to two small networks. Lastly, we have a peripheral network which seems to be distinct. If we zoom in, we see that our largest network is group 
+We see we have one large central network which connects to two small networks. Lastly, we have a peripheral network which seems to be distinct. There simply is too much going on here for us to extract much meaningful information. Let's pare down our information. Instead of creating a network based on genes, let's instead create a network based on the groups. That is, should a gene appear in three distinct groups, 1, 2, 3, we could create a network simply with the nodes 1, 2, 3. We have approximately 200 genes, but only 21 groups! We know all the groups to which each gene belongs, so no information will be lost. Let's combine all of our groupings from the clusters of 3, 6, and 12:
+
+<pre style="color: silver; background: black;">clusters_of_3 = read.csv("clusters_of_3.csv",header=F)
+clusters_of_6 = read.csv("clusters_of_6.csv",header=F)
+clusters_of_12 = read.csv("clusters_of_12.csv",header=F)
+groupings = cbind(clusters_of_3,clusters_of_6)
+groupings = cbind(groupings,clusters_of_12)
+head(groupings)
+<strong>          V1 V2         V1 V2         V1 V2
+1 MSTRG.4142 13 MSTRG.4142 14 MSTRG.4142  1
+2  AT4G14220 13  AT4G14220 14  AT4G14220  1
+3 MSTRG.3788 13 MSTRG.3788 14 MSTRG.3788  1
+4 MSTRG.5824 13 MSTRG.5824 14 MSTRG.5824  1
+5  MSTRG.568 13  MSTRG.568 14  MSTRG.568  1
+6  MSTRG.811 13  MSTRG.811 14  MSTRG.811  1</strong></pre>
+
+We see that our groupings for each gene correspond to columns 2, 4, and 6. Let's keep the first genes column and the groupings columns:
+<pre style="color: silver; background: black;">
+cluster_col = c("TRUE","TRUE","FALSE","TRUE","FALSE","TRUE")
+groupings = groupings[,cluster_col==TRUE]
+groupings_col_names = c("Gene","clusters_of_3","clusters_of_6","clusters_of_12")
+colnames(groupings) = groupings_col_names
+head(groupings)
+<strong>        Gene clusters_of_3 clusters_of_6 clusters_of_12
+1 MSTRG.4142            13            14              1
+2  AT4G14220            13            14              1
+3 MSTRG.3788            13            14              1
+4 MSTRG.5824            13            14              1
+5  MSTRG.568            13            14              1
+6  MSTRG.811            13            14              1</strong></pre>
+
+As we can see, many genes have the same grouping patterns. However, we can extract all of the different grouping patterns using the "unique" function:
+
+<pre style="color: silver; background: black;">colnames(groupings) = groupings_col_names
+set_of_uniques = unique(groupings[2:4])
+set_of_uniques
+<strong>    clusters_of_3 clusters_of_6 clusters_of_12
+1              13            14              1
+15             13            14              2
+21             13            14              3
+30             26            28              4
+35             39            42              5
+52             13            14              6
+75             13            56              7
+97             26            70              8
+106            26            28              9
+136            26            28             10
+171            26            84             11
+173            26            28             12</strong></pre>
+
+Now, we know that each cluster from our clusters of 3 will have a mate in the clusters of 6 and 12. We also know this for clusters of 6 and so on. Because there are two sets containing mates for each cluster, let's create a matrix which contains each cluster vector (so clusters of 3 groupings) twice as the first column, with the mates in the second column (i.e., for the first instance of clusters of 3 in the first column the second column will have the mates from clusters of 6, in the second instance of clusters of 3 in the first column, the second column will have the mates from clusters of 12). Then let's create a complete edge list combining this information for all three clusters:
+
+<pre style="color: silver; background: black;">clusters_of_3_network = c(set_of_uniques[,1],set_of_uniques[,1])
+clusters_of_6_network = c(set_of_uniques[,2],set_of_uniques[,2])
+clusters_of_12_network = c(set_of_uniques[,3],set_of_uniques[,3])
+edge_list_3 = matrix(clusters_of_3_network, nrow =24, ncol=2)
+edge_list_3[,2] = c(set_of_uniques[,2],set_of_uniques[,3])
+edge_list_3
+edge_list_6 = matrix(clusters_of_6_network, nrow =24, ncol=2)
+edge_list_6[,2] = c(set_of_uniques[,1],set_of_uniques[,3])
+edge_list_12 = matrix(clusters_of_12_network, nrow =24, ncol=2)
+edge_list_12[,2] = c(set_of_uniques[,1],set_of_uniques[,2])
+complete_edge_list = rbind(edge_list_3,edge_list_6)
+complete_edge_list = rbind(complete_edge_list, edge_list_12)
+head(complete_edge_list)
+<strong>     [,1] [,2]
+[1,]   13   14
+[2,]   13   14
+[3,]   13   14
+[4,]   26   28
+[5,]   39   42
+[6,]   13   14</strong>
+
+write.csv(complete_edge_list,file = "complete_edge_list.csv",row.names=F)</pre>
+
+Let's now visualize this edge list in Cytoscape. The end result should look something like this:
+
+While this is nice, we would like some computational proof of which groups have the highest connectivity and the degree of relationships among groups. We will term "connectivity" for this tutorial simply as the number of neighbors a group has. We will term "degree of relationship" as the number of neighbors through which one group must go before reaching the other group + 1. Looking at our Cytoscape output we see that for connected groups the greatest degree of relationships is 2. For groups in separate clusters we will call their degree of relationship as -Inf.
+
+If you click on the export button in Cytoscape, we will have the option of exporting the network. Click on that and export the network as a .xml file. 
+
+Now, <a href=https://support.office.com/en-us/article/import-xml-data-6eca3906-d6c9-4f0d-b911-c736da817fa4#bmopen_an_xml_data_file">open the .xml file in Microsoft Excel</a>, and you should see something like this:
+
+While we will not go into great detail here, we are interesetd in the ns1:data4 column. Copy and paste that column into a new Excel workbook and save it under the name "interaction_list.csv". Now let's load this file into R:
+
+<pre style="color: silver; background: black;">interaction_list = read.csv("interaction_list.csv",header=F)
+head(interaction_list)
+<strong> V1                     V2
+1 NA                      x
+2  1 12 (interacts with) 28
+3  2 12 (interacts with) 26
+4  3 11 (interacts with) 84
+5  4 11 (interacts with) 26
+6  5 10 (interacts with) 28</strong></pre>
+
+We see that all of the information has been stored in the second column and the first column is simply an index. Let's keep only the second column:
+
+<pre style="color: silver; background: black;">> interaction_list=interaction_list[,2]
+interaction_list
+<strong> [1] x                      12 (interacts with) 28 12 (interacts with) 26 11 (interacts with) 84
+ [5] 11 (interacts with) 26 10 (interacts with) 28 10 (interacts with) 26 9 (interacts with) 28 
+ [9] 9 (interacts with) 26  8 (interacts with) 70  8 (interacts with) 26  7 (interacts with) 56 
+[13] 7 (interacts with) 13  6 (interacts with) 14  6 (interacts with) 13  5 (interacts with) 42 
+[17] 5 (interacts with) 39  4 (interacts with) 28  4 (interacts with) 26  3 (interacts with) 14 
+[21] 3 (interacts with) 13  2 (interacts with) 14  2 (interacts with) 13  1 (interacts with) 14 
+[25] 1 (interacts with) 13  84 (interacts with) 11 84 (interacts with) 26 70 (interacts with) 8 
+[29] 70 (interacts with) 26 56 (interacts with) 7  56 (interacts with) 13 42 (interacts with) 5 
+[33] 42 (interacts with) 39 39 (interacts with) 5  39 (interacts with) 42 28 (interacts with) 12
+[37] 28 (interacts with) 10 28 (interacts with) 9  28 (interacts with) 4  28 (interacts with) 26
+[41] 28 (interacts with) 26 28 (interacts with) 26 28 (interacts with) 26 26 (interacts with) 12
+[45] 26 (interacts with) 11 26 (interacts with) 10 26 (interacts with) 9  26 (interacts with) 8 
+[49] 26 (interacts with) 4  26 (interacts with) 28 26 (interacts with) 84 26 (interacts with) 28
+[53] 26 (interacts with) 28 26 (interacts with) 70 26 (interacts with) 28 14 (interacts with) 6 
+[57] 14 (interacts with) 3  14 (interacts with) 2  14 (interacts with) 1  14 (interacts with) 13
+[61] 14 (interacts with) 13 14 (interacts with) 13 14 (interacts with) 13 13 (interacts with) 7 
+[65] 13 (interacts with) 6  13 (interacts with) 3  13 (interacts with) 2  13 (interacts with) 1 
+[69] 13 (interacts with) 56 13 (interacts with) 14 13 (interacts with) 14 13 (interacts with) 14
+[73] 13 (interacts with) 14
+61 Levels: 1 (interacts with) 13 1 (interacts with) 14 10 (interacts with) 26 ... x</strong>
+dim(interaction_list)
+<strong>NULL</strong>
+&#35;&#35;we see that our interaction list is just a vector now
+length(interaction_list)
+<strong>73</strong>
+interaction_list[1]
+<strong>x</strong>
+&#35;&#35;this value is not needed, let's remove it from our interaction list
+interaction_list = interaction_list[2:73]
+</pre>
+Now we simply need to create a matrix which contains all of our sources (the group before "interacts with") in the first column and all of their sinks (the group after "interacts with") in the second column. First, it will be useful to remove "(interacts with)" from all of the elements. We can do this using <a href=http://stat.ethz.ch/R-manual/R-devel/library/base/html/grep.html">gsub</a>:
+<pre style="color: silver; background: black;">	
+interaction_list = gsub("[[:punct:]]interacts with[[:punct:]] ","",interaction_list)
+interaction_list
+<strong> [1] "12 28" "12 26" "11 84" "11 26" "10 28" "10 26" "9 28"  "9 26"  "8 70"  "8 26"  "7 56"  "7 13"  "6 14" 
+[14] "6 13"  "5 42"  "5 39"  "4 28"  "4 26"  "3 14"  "3 13"  "2 14"  "2 13"  "1 14"  "1 13"  "84 11" "84 26"
+[27] "70 8"  "70 26" "56 7"  "56 13" "42 5"  "42 39" "39 5"  "39 42" "28 12" "28 10" "28 9"  "28 4"  "28 26"
+[40] "28 26" "28 26" "28 26" "26 12" "26 11" "26 10" "26 9"  "26 8"  "26 4"  "26 28" "26 84" "26 28" "26 28"
+[53] "26 70" "26 28" "14 6"  "14 3"  "14 2"  "14 1"  "14 13" "14 13" "14 13" "14 13" "13 7"  "13 6"  "13 3" 
+[66] "13 2"  "13 1"  "13 56" "13 14" "13 14" "13 14" "13 14"</strong>
+</pre>
+We can now create our sources and sinks by taking the first two characters and last two characters, respectively of each element using <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/substr.html">substr</a> and <a href="https://www.rdocumentation.org/packages/base/versions/3.5.0/topics/nchar">nchar</a>.
+	
+<pre style="color: silver; background: black;">sources_and_sinks = matrix(0, nrow=72, ncol=2)
+sources = vector(length=72)
+sinks = vector(length=72)
+for (i in 1:72){sources[i] = substr(interaction_list[i],1,2)}
+sources
+<strong>[1] "12" "12" "11" "11" "10" "10" "9 " "9 " "8 " "8 " "7 " "7 " "6 " "6 " "5 " "5 " "4 " "4 " "3 " "3 " "2 " "2 "
+[23] "1 " "1 " "84" "84" "70" "70" "56" "56" "42" "42" "39" "39" "28" "28" "28" "28" "28" "28" "28" "28" "26" "26"
+[45] "26" "26" "26" "26" "26" "26" "26" "26" "26" "26" "14" "14" "14" "14" "14" "14" "14" "14" "13" "13" "13" "13"
+[67] "13" "13" "13" "13" "13" "13"</strong>
+for (i in 1:72){sinks[i] = substr(interaction_list[i],nchar(interaction_list[i])-2,nchar(interaction_list[i]))}
+sinks
+<strong>[1] " 28" " 26" " 84" " 26" " 28" " 26" " 28" " 26" " 70" " 26" " 56" " 13" " 14" " 13" " 42" " 39" " 28" " 26"
+[19] " 14" " 13" " 14" " 13" " 14" " 13" " 11" " 26" "0 8" " 26" "6 7" " 13" "2 5" " 39" "9 5" " 42" " 12" " 10"
+[37] "8 9" "8 4" " 26" " 26" " 26" " 26" " 12" " 11" " 10" "6 9" "6 8" "6 4" " 28" " 84" " 28" " 28" " 70" " 28"
+[55] "4 6" "4 3" "4 2" "4 1" " 13" " 13" " 13" " 13" "3 7" "3 6" "3 3" "3 2" "3 1" " 56" " 14" " 14" " 14" " 14"</strong>
+</pre>
+
+We see that some of our initial cells had one fewer character than others, so we have actually grabbed the last digit of the source alongside! The reason for this is that substr does not consider whitespace as a character! We can remove these using sub:
+
+<pre style="color: silver; background: black;">sinks = gsub("[0-9] ", "", sinks)
+sinks
+<strong> [1] " 28" " 26" " 84" " 26" " 28" " 26" " 28" " 26" " 70" " 26" " 56" " 13" " 14" " 13" " 42" " 39" " 28" " 26"
+[19] " 14" " 13" " 14" " 13" " 14" " 13" " 11" " 26" "8"   " 26" "7"   " 13" "5"   " 39" "5"   " 42" " 12" " 10"
+[37] "9"   "4"   " 26" " 26" " 26" " 26" " 12" " 11" " 10" "9"   "8"   "4"   " 28" " 84" " 28" " 28" " 70" " 28"
+[55] "6"   "3"   "2"   "1"   " 13" " 13" " 13" " 13" "7"   "6"   "3"   "2"   "1"   " 56" " 14" " 14" " 14" " 14"</strong></pre>
+
+If we compare element 55 across all of our vectors, we see that we have the correct format and information. Now, let's create our sources and sinks matrix. A word of note, these are not truly sources and sinks! They connect in both directions. Because of this, we will want to make our sources and sinks matrix, a sinks and sources matrix, and then adjoin the two together by rows:
+
+<pre style="color: silver; background: black;">sources_and_sinks = matrix(0,nrow=72,ncol=2)
+sinks_and_sources = matrix(0, nrow=72, ncol=2)
+sources_and_sinks[,1] = sources
+sources_and_sinks[,2] = sinks
+sinks_and_sources[,1] = sinks
+sinks_and_sources[,2] = sources
+sources_and_sinks_complete = rbind(sources_and_sinks,sinks_and_sources)
+head(sources_and_sinks_complete)
+<strong>     [,1] [,2] 
+[1,] "12" " 28"
+[2,] "12" " 26"
+[3,] "11" " 84"
+[4,] "11" " 26"
+[5,] "10" " 28"
+[6,] "10" " 26"</strong>
+&#35&#35; because "sources" and "sinks" is a bit of a misnomer here, we can name our columns sources and sinks
+colnames(sources_and_sinks_complete) = c("sources","sinks")
+&#35&#35the easiest way to convert these character vectors into integers is simply to save the object as a csv and load it
+write.csv(file="sources_and_sinks_complete.csv",sources_and_sinks_complete,row.names=F)
+sources_and_sinks_complete=read.csv("sources_and_sinks_complete.csv",header=T)
+head(sources_and_sinks_complete)
+<strong>  sources sinks
+1      12    28
+2      12    26
+3      11    84
+4      11    26
+5      10    28
+6      10    26</strong>
+&#35;&#35;let's determine all of our unique sources and sinks pairs
+unique_interactions = unique(sources_and_sinks_complete)
+head(unique_interactions)
+<strong>  sources sinks
+1      12    28
+2      12    26
+3      11    84
+4      11    26
+5      10    28
+6      10    26</strong>
+nrow(unique_interactions)
+<strong>60</strong></pre>
+
+We have 60 unique interactions. Our first job is to determine our degree of relations. To do this, we first need a starting degree of relations matrix. We know that we have 21 groups. Let's make a 21 by 21 matrix and place its column and row names as our groups:
+
+<pre style="color: silver; background: black;">degree_of_relation_matrix = matrix(0, nrow=21, ncol=21)
+&#35;&#35;we know that each group appears in either of the columns, so we can simply grab all of our groups from the sources columns
+groups = unique(unique_interactions[,1])
+&#35;&#35;we order our columns to make them easier to read
+groups = sort(groups,decreasing=FALSE)
+&#35;now we name our degree_of_relation_matrix
+rownames(degree_of_relation_matrix) = groups
+colnames(degree_of_relation_matrix) = groups
+degree_of_relation_matrix
+
+ <strong>1 2 3 4 5 6 7 8 9 10 11 12 13 14 26 28 39 42 56 70 84
+1  0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0
+2  0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0
+3  0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0
+4  0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0
+5  0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0
+6  0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0
+7  0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0
+8  0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0
+9  0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0
+10 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0
+11 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0
+12 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0
+13 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0
+14 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0
+26 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0
+28 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0
+39 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0
+42 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0
+56 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0
+70 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0
+84 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0</strong></pre>
+
+We know a few things which will help us fill in this matrix. Remember that the degree of relationship is simply the number of neighbors through which one group must go to get to the other + 1. That means the most closely related groups will have a degree of 1. What about each group with itself? As a conventional rule, we will define each group as having a 0th degree of relationship with itself. Great, we now know that groups that are connected with no neighbors in between necessary will have a degree of 1, with one neighbor between necessary 2, and so forth. We are lucky in that we know from our Cytoscape output that our highest degree of relationship is 2. Our final convention is that should two groups be disconnected we give them a degree of relationship of infinity (the higher the degree, the less connected the groups are). While most of this code is straight forward, let's take a minute to go over how we will determine those with a second degree of relationship. Suppose we have groups A and B which has a second degree of relatioship. We know that A and B must share a neighbor. But how do we determine that? Well, if we take the neighbors of A's neighbors, and the neighbors of B's neighbors, we know that at least one of A's neighbors' neighbors and B's neighbors' neighbors will be the same. Therefore, if the length of the intersection of A's neighbors' neighbors and B's neighbors' neighbors is 1 or above, A and B have a second degree relationship! While that is all very confusing, I invite you to read it over a few times until the sense is apparent. Because we know that our highest degree of relationship is 2, if the intersection described prior is the empty set then A and B are not connected, and have a degree of relationship of infinity. Let's now write our code:
+
+<pre style="color: silver; background: black;">for (i in 1:nrow(degree_of_relation_matrix)){
+for (j in 1:ncol(degree_of_relation_matrix)){
+source = rownames(degree_of_relation_matrix)[i]
+sink = colnames(degree_of_relation_matrix)[j]
+if (source == sink){
+degree_of_relation_matrix[i,j]=0}
+
+else {
+interaction = c(source, sink)
+interaction = matrix(as.integer(interaction), ncol = 2, byrow=T)
+success = FALSE
+if (success==FALSE){
+for (x in 1:nrow(unique_interactions)){
+if(sum(interaction == unique_interactions[x,])==2){
+degree_of_relation_matrix[i,j] = 1
+success = TRUE
+}
+}
+}
+if (success==FALSE){
+extended_source_interaction = unique_interactions[unique_interactions$source == source,]
+extended_sink_interaction = unique_interactions[unique_interactions$sink == sink,]
+if (length(intersect(extended_source_interaction[,2],extended_sink_interaction[,1]))>=1){
+degree_of_relation_matrix[i,j] = 2
+}
+else{degree_of_relation_matrix[i,j] = -Inf
+}
+}
+}
+}
+}
+
+degree_of_relation_matrix
+<strong>
+      1    2    3    4    5    6    7    8    9   10   11   12   13   14   26   28   39   42   56   70   84
+1     0    2    2 -Inf -Inf    2    2 -Inf -Inf -Inf -Inf -Inf    1    1 -Inf -Inf -Inf -Inf    2 -Inf -Inf
+2     2    0    2 -Inf -Inf    2    2 -Inf -Inf -Inf -Inf -Inf    1    1 -Inf -Inf -Inf -Inf    2 -Inf -Inf
+3     2    2    0 -Inf -Inf    2    2 -Inf -Inf -Inf -Inf -Inf    1    1 -Inf -Inf -Inf -Inf    2 -Inf -Inf
+4  -Inf -Inf -Inf    0 -Inf -Inf -Inf    2    2    2    2    2 -Inf -Inf    1    1 -Inf -Inf -Inf    2    2
+5  -Inf -Inf -Inf -Inf    0 -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf    1    1 -Inf -Inf -Inf
+6     2    2    2 -Inf -Inf    0    2 -Inf -Inf -Inf -Inf -Inf    1    1 -Inf -Inf -Inf -Inf    2 -Inf -Inf
+7     2    2    2 -Inf -Inf    2    0 -Inf -Inf -Inf -Inf -Inf    1    2 -Inf -Inf -Inf -Inf    1 -Inf -Inf
+8  -Inf -Inf -Inf    2 -Inf -Inf -Inf    0    2    2    2    2 -Inf -Inf    1    2 -Inf -Inf -Inf    1    2
+9  -Inf -Inf -Inf    2 -Inf -Inf -Inf    2    0    2    2    2 -Inf -Inf    1    1 -Inf -Inf -Inf    2    2
+10 -Inf -Inf -Inf    2 -Inf -Inf -Inf    2    2    0    2    2 -Inf -Inf    1    1 -Inf -Inf -Inf    2    2
+11 -Inf -Inf -Inf    2 -Inf -Inf -Inf    2    2    2    0    2 -Inf -Inf    1    2 -Inf -Inf -Inf    2    1
+12 -Inf -Inf -Inf    2 -Inf -Inf -Inf    2    2    2    2    0 -Inf -Inf    1    1 -Inf -Inf -Inf    2    2
+13    1    1    1 -Inf -Inf    1    1 -Inf -Inf -Inf -Inf -Inf    0    1 -Inf -Inf -Inf -Inf    1 -Inf -Inf
+14    1    1    1 -Inf -Inf    1    2 -Inf -Inf -Inf -Inf -Inf    1    0 -Inf -Inf -Inf -Inf    2 -Inf -Inf
+26 -Inf -Inf -Inf    1 -Inf -Inf -Inf    1    1    1    1    1 -Inf -Inf    0    1 -Inf -Inf -Inf    1    1
+28 -Inf -Inf -Inf    1 -Inf -Inf -Inf    2    1    1    2    1 -Inf -Inf    1    0 -Inf -Inf -Inf    2    2
+39 -Inf -Inf -Inf -Inf    1 -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf    0    1 -Inf -Inf -Inf
+42 -Inf -Inf -Inf -Inf    1 -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf    1    0 -Inf -Inf -Inf
+56    2    2    2 -Inf -Inf    2    1 -Inf -Inf -Inf -Inf -Inf    1    2 -Inf -Inf -Inf -Inf    0 -Inf -Inf
+70 -Inf -Inf -Inf    2 -Inf -Inf -Inf    1    2    2    2    2 -Inf -Inf    1    2 -Inf -Inf -Inf    0    2
+84 -Inf -Inf -Inf    2 -Inf -Inf -Inf    2    2    2    1    2 -Inf -Inf    1    2 -Inf -Inf -Inf    2    0</strong>
+
+write.csv(file="degree_of_relation_matrix.csv",degree_of_relation_matrix,row.names=T)</pre>
+
+Notice two things: the first is that the diagonal is 0, the second is that the matrix is symmetric across its diagonal. I will leave those two points for you to ponder. Our final task is much easier. We simply want to determine the connectivity of each group. Therefore, we only need a matrix with one column, each row corresponding to a group. We also know that because our unique_interactions group is non-redundant, every time a group appears in either the first (or second, as they are symmetric) column that it is a unique connection. We can calculate the total number of each connections per group to get the total connectivity for the group. Let's make the matrix:
+
+<pre style="color: silver; background: black;">total_connectivity = matrix(1:nrow(degree_of_relation_matrix),ncol=1)
+rownames(total_connectivity) = rownames(degree_of_relation_matrix)
+
+for (i in 1:nrow(total_connectivity)){
+total_connectivity[i,] = sum(rownames(total_connectivity)[i] == unique_interactions[,1])
+}
+total_connectivity
+<strong>   [,1]
+1     2
+2     2
+3     2
+4     2
+5     2
+6     2
+7     2
+8     2
+9     2
+10    2
+11    2
+12    2
+13    7
+14    5
+26    9
+28    5
+39    2
+42    2
+56    2
+70    2
+84    2</strong>
+write.csv(file="total_connectivity_by_group.csv",total_connectivity,row.names=T)</pre>
+
+<h2 id="Eighth_Point_Header">Conclusion</h2>
+You may find yourself wondering exactly what it is that we acccomplished by the end of this analysis. First, to recap we:
+
+<pre style="color: silver; background: black;">Downloaded experimental data
+Performed quality control on the experimental data
+Aligned the experimental data to the reference genome, allowing us to determine which genes are active in each sample
+Determined and quantified the gene isoforms present in each sample
+Determined which gene isoforms had different general expression patterns between phenotypes
+Created visual gene topologial networks
+Extracted computational information about those networks</pre>
+
+While our work may have seemed completed after creating the visualization, the picture itself is not of much use to other scientists! However, all of the csv files we created are. A scientist may have an interest in one particular gene we studied. With our differential expression results output she will be able to determine how the gene's behavior varied according to phenotype. Perhaps she wants to begin investigating if one gene codes for a transcription factor of another. She can consult our gene complete clusters file and see if the two genes belong to the same cluster. She may be interested in the total behavior of one cluster in activating or suppressing another cluster. She can determine her base and target clusters by locating the gene in our complete clusters file, extract all genes from those cluster, and then explore if how downstream each cluster's effect may be by utilizing the degree of relationship csv. Bioinformatics is a collaborative field. We are always dependent on the work of others to solve the questions about which we are the most passionate. Because of this, it is important to always dig deep in your own analysis, and to create as readable and handy data as you can. Not only because you do not want another scientist to be lost in your files, but they must be readable by a computer! Sometimes, it may have felt like we were going down the rabbit hole in this tutorial. However, the information we compiled is easy and immediately helpful for fellow scientists to use. Congratulations on finishing this tutorial successfully!
