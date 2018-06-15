@@ -33,7 +33,7 @@ Your home directory contains 10TB of storage and will not pollute the capacities
 The workflow may be cloned into the appropriate directory using the terminal command:
 <pre style="color: silver; background: black;">-bash-4.2$ git clone https://github.com/wolf-adam-eily/rnaseq_for_model_plant.git
 -bash-4.2$ cd rnaseq_for_model_plant
--bash-4.2$ ls<
+-bash-4.2$ ls
 -bash-4.2$ cd rnaseq_for_model_plant/
 -bash-4.2$ ls
 <strong>all_clusters.csv.png           README.md
@@ -161,7 +161,7 @@ We have single-end sequences.
 --help, display this help and exit
 --version, output version information and exit</pre>
 
-The quality may be any score from 0 to 40. The default of 20 is much too low for a robust analysis. We want to select only reads with a quality of 35 or better. Additionally, the desired length of each read is 50bp. Again, we see that a default of 20 is much too for analysis confidence. We want to select only reads whose length exceeds 45bp. Lastly, we must know the scoring type. While the quality type is not listed on the SRA pages, most SRA reads use the "sanger" quality type. Unless explicitly stated, try running sickle using the sanger qualities. If an error is returned, try illumina. If another error is returned, lastly try solexa.
+The quality may be any score from 0 to 40. The default of 20 is much too low for a robust analysis. We want to select only reads with a quality of 35 or better. Additionally, the desired length of each read is 50bp. Again, we see that a default of 20 is much too low for analysis confidence. We want to select only reads whose lengths exceed 45bp. Lastly, we must know the scoring type. While the quality type is not listed on the SRA pages, most SRA reads use the "sanger" quality type. Unless explicitly stated, try running sickle using the sanger qualities. If an error is returned, try illumina. If another error is returned, lastly try solexa.
 
 Let's put all of this together for our sickle script using our downloaded fastq files:
 
@@ -243,7 +243,7 @@ multiqc -f -n trimmed trimmed*
 
 fastqc will create the files "trimmed_file_fastqc.html". To have a look at one, we need to move all of our "trimmed_file_fastqc.html" files into a single directory, and then <a href="https://www.techrepublic.com/article/how-to-use-secure-copy-for-file-transfer/">secure copy</a> that folder to our local directory. Then, we may open our files! If that seems like too much work for you, you may open the files directly through this github. Simply click on any "html" file and you may view it in your browser immediately. Because of this, the steps mentioned above will not be placed in this tutorial.
 
-This script will create a directory "trimmed_data". Let's look inside of that directory:
+This script will also create a directory "trimmed_data". Let's look inside of that directory:
 
 <pre style="color: silver; background: black;">-bash-4.2$ cd trimmed_data<
 -bash-4.2$ ls 
@@ -373,11 +373,11 @@ SRR3498212.29	4	*	0	0	*	*	0	0	TATGTCTACGCTGGTTCAAATCCAGCTCGGCCCACCAAGATCGGAAGAGC
 SRR3498212.18	4	*	0	0	*	*	0	0	CGTGGGTTCGACTCCCACTGTGGTCGCCAAGATCGGAAGAGCACACGTC	DDDCHCCHHHEIHIGIIIEGHHIIIIGHHHIIIIIIIIIIIIIIIIIII	YT:Z:UU
 </pre>
 
-All of the lines starting with an "@" symbol tell us something about the chromosomes or our input. For instance "@SQ SN:Chr1 LN:30427671" tells us that we have a sequence (@SQ) whose sequence name is Chr1 (SN:Chr1), lastly the sequence has a length of 30427671bp (LN:30427671). You may be wondering what the first line means. It is quite straightfoward! The first line is simply the header (@HD) statig that the file is unsorted (SO:unsorted). The second column in the first line is somewhat of a dummy variable, but stands for "version number". Lastly we have the "@PG" line, which, in order, keeps track of the software used to write the file (ID:hisat2), the program name used to align the reads (PN:hisat2), the version of the program used (VN:2.1.0), and lastly the user input which started the process (written in the form that the program reads, not in which we wrote it).
+All of the lines starting with an "@" symbol tell us something about the chromosomes or our input. For instance "@SQ SN:Chr1 LN:30427671" tells us that we have a sequence (@SQ) whose sequence name is Chr1 (SN:Chr1), lastly the sequence has a length of 30427671bp (LN:30427671). You may be wondering what the first line means. It is quite straightfoward! The first line is simply the header (@HD) stating that the file is unsorted (SO:unsorted). The second column in the first line is somewhat of a dummy variable, but stands for "version number". Lastly we have the "@PG" line, which, in order, keeps track of the software used to write the file (ID:hisat2), the program name used to align the reads (PN:hisat2), the version of the program used (VN:2.1.0), and lastly the user input which started the process (written in the form that the program reads, not in which we wrote it).
 
 The alignment portion of the SAM file is much more straight-forward and may be understood by reading the SAM output formatting guide linked in the beginning of this tutorial.
 
-Because of the density of the sam file, it is compressed to binary to create a more easily tractable file for manipulation by future programs. We convert the sam file to b<sub>inary</sub>am with the following command and sort it such that the alignments are listed in the order the genes appear in the genome. To do this we use the software <a href="https://en.wikipedia.org/wiki/SAMtools">samtools</a>
+Because of the density of the sam file, it is compressed to binary to create a more easily tractable file for manipulation by future programs. We convert the sam file to bam with the following command and sort it such that the alignments are listed in the order the genes appear in the genome. To do this we use the software <a href="https://en.wikipedia.org/wiki/SAMtools">samtools</a>:
 
 <pre style="color: silver; background: black;">-bash-4.2$ module load samtools
 bash-4.2$ samtools
@@ -625,10 +625,10 @@ We see we have a condensed form of our various exons. The exon loci name is the 
   GNU nano 2.3.1                                                      File: merged.stats                                                                                                                    
 
 &#35; gffcompare v0.10.4 | Command line was:
-&#35;gffcompare -r athaliana_TAIR10_genes.gtf -G -o merged stringtie_merged.gtf
+&#35; gffcompare -r athaliana_TAIR10_genes.gtf -G -o merged stringtie_merged.gtf
 &#35;
 
-&#35;= Summary for dataset: stringtie_merged.gtf
+&#35; Summary for dataset: stringtie_merged.gtf
 &#35;     Query mRNAs :   41854 in   33403 loci  (30272 multi-exon transcripts)
 &#35;            (6013 multi-transcript loci, ~1.3 transcripts per locus)
 &#35; Reference mRNAs :   41607 in   33350 loci  (30127 multi-exon)
@@ -782,7 +782,7 @@ stringtie -e -B -p 16 athaliana_shoot_2.bam -G stringtie_merged.gtf -o ballgown/
 <pre style="color: silver; background: black;">-bash-4.2$ sbatch transcript_assembly.sh</pre>
 
 <h2 id="Sixth_Point_Header">Differential expression analysis using ballgown</h2>
-For many organisms, many of the same genes are expressed in separate cell types, with a variety of phenotype differences a result of the specific isoforms a cell will use. Therefore, when performing a differential expression analysis from different parts of one organism (not one species, but a singular organism), it is wise to perform an isoform expression analysis alongside a standard differential expression analysis and combine the results. We will only be performing the isoform expresion analysis. <a href="https://bioconductor.org/packages/release/bioc/html/ballgown.html">Ballgown</a> is a differential expression package for R via Bioconductor ideal for isoform expression analyses. Before beginning, you need to secure copy our ballgown directory from Xanadu to your local machine:
+For many organisms, many of the same genes are expressed in separate cell types, with a variety of phenotype differences a result of the specific isoforms a cell will use. Therefore, when performing a differential expression analysis from different parts of one organism (not one species, but a singular organism), it is wise to perform an isoform expression analysis alongside a standard differential expression analysis and combine the results (as we are doing here). We will only be performing the isoform expresion analysis. <a href="https://bioconductor.org/packages/release/bioc/html/ballgown.html">Ballgown</a> is a differential expression package for R via Bioconductor ideal for isoform expression analyses. Before beginning, you need to secure copy our ballgown directory from Xanadu to your local machine:
 
 <pre style="color: silver; background: black;">-bash-4.2$ exit
 logout
