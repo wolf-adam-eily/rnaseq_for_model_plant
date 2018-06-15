@@ -1036,7 +1036,7 @@ write.csv(results_genes, "results_genes.csv", row.names=FALSE)
 &#35;&#35;we use row.names=FALSE because currently the row names are just the numbers 1, 2, 3. . .
 </pre>
 
-We should take advantage while we have this results_genes object and annotate the genes we have deemed significant (p-values below 0.01, every gene now in this object). To annotate the genes we will be using <a href="https://www.bioconductor.org/packages/devel/bioc/html/biomaRt.html"</a>biomaRt</a> and biomartr. You can install these with the following code:
+We should take advantage while we have this results_genes object and annotate the genes we have deemed significant (p-values below 0.01, every gene now in this object). To annotate the genes we will be using <a href="https://www.bioconductor.org/packages/devel/bioc/html/biomaRt.html">biomaRt</a> and biomartr. You can install these with the following code:
 <pre style="color: silver; background: black;">
 ## try http:// if https:// URLs are not supported
 source("https://bioconductor.org/biocLite.R")
