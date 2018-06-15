@@ -262,7 +262,7 @@ This screen is simply a <a href="https://en.wikipedia.org/wiki/Box_plot">box-and
 Our next index is the per sequence quality scores:
 <img src="fastqc3.png">
 
-This index is simply the total number of base pairs (y-axis) which have a given quality score (x-axis). This plot is discontinuous and discrete, and should you calculate the <a href=https://en.wikipedia.org/wiki/Riemann_sum">Riemann sum</a> the result is the total number of base pairs present across all reads.
+This index is simply the total number of base pairs (y-axis) which have a given quality score (x-axis). This plot is discontinuous and discrete, and should you calculate the <a href="https://en.wikipedia.org/wiki/Riemann_sum">Riemann sum</a> the result is the total number of base pairs present across all reads.
 	
 The last index at which we are going to look is the "Overrepresented Sequences" index:
 <img src="fastqc4.png">
@@ -1168,7 +1168,7 @@ text(pca[,1],pca[,2],pos=2,short_names, col=c("red", "red", "blue", "blue"))</pr
 
 <h2 id="Seventh_Point_Header">Topological networking using cytoscape</h2>
 
-<a href="https://github.com/miriamposner/cytoscape_tutorials">Cytoscape</a> is a desktop program which creates visual topological networks of data. The only requirement to create a topological network in Cytospace is to have an "edge list". An edge list is a two-column list which comprises two separate types of data. Each row of the edge list is a single piece of information (so both columns combine to form a piece of infromation for the row) that Cytospace uses. To begin, download and install Cytospace. Now, let's go over the two columns of an edge list:
+<a href="https://github.com/miriamposner/cytoscape_tutorials">Cytoscape</a> is a desktop program which creates visual topological networks of data. The only requirement to create a topological network in Cytoscape is to have an "edge list". An edge list is a two-column list which comprises two separate types of data. Each row of the edge list is a single piece of information (so both columns combine to form a piece of infromation for the row) that Cytoscape uses. To begin, download and install Cytoscape. Now, let's go over the two columns of an edge list:
 
 The two columns of an edge list represent the "sources" and "nodes". You may instead think of the two columns representing an object and its group. For instance, the edge list:
 
@@ -1283,7 +1283,7 @@ write.csv(clusters_of_3_csv, file="clusters_of_3.csv", row.names=F)</pre>
 
 Now that we have our clusters, we are going to need to combine all of them into one edge list. This seems easy, but keep in mind that if we copy and paste them as is we have three group 1s, 2s, and 3s, which each are actually a different group! Let's start with the clusters of 3. We know that in our largest we have groups 1-12. So for each group in clusters of 3 we must transform them such that they are not any number 1 - 12. The easiest way to do this is to multiply each by 13, which will give us 13, 26, 39 as our new groups. Those are not present in any other clustering, so we maintain that they are all unique groups across files. In Excel simply multiply the entire column by 13 in the clusters of 3 file. Now we repeat for the clusters of 6, multiplying each group instead by 14. Our groups are now 1-12, 13, 26, 39, 14, 28, 42, 56, 70, 80. No overlap! Lastly we simply copy clusters of 6 and paste it beneath clusters of 3, followed by copying clusters of 12 and pasting those beneath the other two. Lastly, save your file and you are ready to use Cytoscape!
 
-First, load Cytospace and you will be greeted with a screen like this:
+First, load Cytoscape and you will be greeted with a screen like this:
 <img src="cytoscape1.png">
 Click this icon:
 <img src="cytoscape2.png">
@@ -1291,7 +1291,7 @@ Click this icon:
 and load your data. Your screen should now look like:
 <img src="cytoscape3.png">
 
-Cytospace does not know which are the sources and which are the nodes. We know that our genes are our sources flowing into our nodes. Therefore, we click on sample and the following window should appear:
+Cytoscape does not know which are the sources and which are the nodes. We know that our genes are our sources flowing into our nodes. Therefore, we click on sample and the following window should appear:
 <img src="cytoscape4.png">
 Click on "Source node".
 
