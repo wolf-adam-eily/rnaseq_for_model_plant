@@ -1014,8 +1014,7 @@ plot(density(fpkm[,1]),main="Density Comparison")
 lines(density(fpkm[,2])
 lines(density(fpkm[,3])
 lines(density(fpkm[,4])</pre>
-<img src="https://imgflip.com/gif/2c97eg">
-
+<a href="https://imgflip.com/gif/2c97eg"><img src="https://i.imgflip.com/2c97eg.gif"></a>
 We see that overall the distributions are pretty similar, but not identical -- shoot 2 has the highest expression levels while root 2 has the lowest.
 
 Now we will generate a <a href="http://setosa.io/ev/principal-component-analysis/">PCA</a> plot. I strongly advise you read the PCA link before continuing if you are not familiar with Principal Component Analysis. It will not be explained in this tutorial.
