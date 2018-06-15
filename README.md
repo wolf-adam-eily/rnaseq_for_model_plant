@@ -1013,7 +1013,7 @@ results_genes = stattest(bg_filt, feature="gene" , covariate = "part" , getFC = 
 
 Let's take a look at this object:
 
-<pre style="color: silver; background: black;">head(gene_results)
+<pre style="color: silver; background: black;">head(results_genes)
 <strong>  feature         id           fc         pval      qval
 1    gene MSTRG.4142 2.075827e-01 0.0000491845 0.5184498
 2    gene  AT4G14220 2.103846e+01 0.0001882308 0.5184498
@@ -1032,7 +1032,7 @@ results_genes = subset(results_genes, pval < 0.01)
 results_transcripts = arrange(results_transcripts, pval)
 results_transcripts = subset(results_transcripts, pval < 0.01)
 write.csv(results_transcripts, "transcript_results.csv", row.names=FALSE)
-write.csv(results_genes, "gene_results.csv", row.names=FALSE)
+write.csv(results_genes, "results_genes.csv", row.names=FALSE)
 &#35;&#35;we use row.names=FALSE because currently the row names are just the numbers 1, 2, 3. . .
 </pre>
 
@@ -1216,7 +1216,7 @@ Should we only want to annotate genes from a specific chromosome or any other cr
 4       AT2G45780                       other RNA [Source:TAIR;Acc:AT2G45780]
 5       AT2G42425                    Unknown gene [Source:TAIR;Acc:AT2G42425]
 6       AT4G01533                       other RNA [Source:TAIR;Acc:AT4G01533]</strong>
-head(gene_results)
+head(results_genes)
 <strong> feature         id           fc         pval      qval
 1    gene MSTRG.4142 2.075827e-01 0.0000491845 0.5184498
 2    gene  AT4G14220 2.103846e+01 0.0001882308 0.5184498
@@ -1225,8 +1225,8 @@ head(gene_results)
 5    gene  MSTRG.568 3.186395e-01 0.0002764999 0.5184498
 6    gene  MSTRG.811 3.236509e-04 0.0003448702 0.5184498</strong></pre>
 
-Funny enough, we do not actually use a biomaRt function to annotate our genes! We can simply subset the thale cress data frame to consist of only rows whose ensemble_gene_id matches our gene_results id. Let's give it a try:
-<pre style="color: silver; background: black;">annotated_genes = subset(thale_cress_data_frame, ensembl_gene_id %in% gene_results$id)
+Funny enough, we do not actually use a biomaRt function to annotate our genes! We can simply subset the thale cress data frame to consist of only rows whose ensemble_gene_id matches our results_genes id. Let's give it a try:
+<pre style="color: silver; background: black;">annotated_genes = subset(thale_cress_data_frame, ensembl_gene_id %in% results_genes$id)
 head(annotated_genes)
 <strong>     ensembl_gene_id ensembl_peptide_id                                            description
 340        AT2G07754                                      pre-tRNA [Source:TAIR;Acc:AT2G07754]
@@ -1237,7 +1237,7 @@ head(annotated_genes)
 5352       AT1G79830        AT1G79830.5 Golgin Putative 5 [Source:UniProtKB/TrEMBL;Acc:F4HQB9]</strong>
 ##let's check our dimensions to ensure every gene was annotated
 
-dim(gene_results)
+dim(results_genes)
 <strong>[1] 216   5</strong>
 dim(annotated_genes)
 <strong>[1] 233   3</strong>
@@ -1306,10 +1306,10 @@ Not a single one of the "MSTRG" sequences has been annotated. It is time we addr
 Lastly, let's remove the MSTRG sequences from our gene results object and write our files:
 
 <pre style="color: silver; background: black;">write.csv(file="annotated_genes.csv",annotated_genes,row.names=F)
-gene_results = subset(gene_results, id %in% annotated_genes$ensembl_gene_id)
-dim(gene_results)
+results_genes = subset(results_genes, id %in% annotated_genes$ensembl_gene_id)
+dim(results_genes)
 <strong> 116 5</strong>
-head(gene_results)</pre>
+head(results_genes)</pre>
 <strong>feature        id         fc         pval      qval
 2     gene AT4G14220 21.0384627 0.0001882308 0.5184498
 7     gene AT5G13680  0.0410302 0.0003455516 0.5184498
@@ -1480,7 +1480,7 @@ To achieve this, we can create a series of family trees, or <a href="https://en.
 	
 <pre style="color: silver; background: black;">
 ##re-set working directory if you have exited R, and re-load libraries
-diffexp_genes = read.csv("gene_results.csv",header=T)
+diffexp_genes = read.csv("results_genes.csv",header=T)
 diffexp_genes = as.data.frame(diffexp_genes)
 gene_ids = diffexp_genes[,2]
 head(diffexp_genes)
