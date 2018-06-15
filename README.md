@@ -1017,6 +1017,7 @@ expression data using texpr() and specifying a measure.
 fpkm = texpr(bg, meas = "FPKM")
 &#35;&#35;let's look at the distribution
 plot(density(fpkm),main="Density Plot of \nUntransformed FPKM")</pre>
+<img src="Rplot.png">
 We can see virtually nothing except that there are many, many genes that are lowly expressed. The reason for the sharp peak 
 is that the density plot automatically scales its x-axis from the lowest expressed to the highest expressed. Let's see what 
 those values are:
@@ -1144,7 +1145,7 @@ par(mfrow=c(1,1))
 point_colors = c("red", "red", "blue", "blue")
 plot(pca[,1],pca[,2], xlab="", ylab="", main="PCA plot for all libraries", xlim=c(-0.2,0.2), ylim=c(-0.2,0.2),col=point_colors)
 text(pca[,1],pca[,2],pos=2,short_names, col=c("red", "red", "blue", "blue"))</pre>
-
+<img src="pcaplot_for_all_libraries.png">
 
 <h2 id="Seventh_Point_Header">Topological networking using cytoscape</h2>
 
