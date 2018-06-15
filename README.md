@@ -18,7 +18,7 @@ This repository is a usable, publicly available tutorial for analyzing different
 
 <h2 id="First_Point_Header">Introduction and programs</h2>
 
-In this tutorial, we will be analyzing thale cress (Arabidopsis thaliana) RNA-Seq data from various parts of the plant (roots, stems). Perhaps one of the most common organisms for genetic study, the aggregrate wealth of genetic information of the thale cress makes it ideal for new-comers to learn. Organisms such as this we call "model organisms". You may think of model organisms as a subset of living things which, under the normal conventions of analysis, behave nicely. The data we will be analyzing comes from an experiment in which various cellular RNA was collected from the roots and shoots of a single thale cress. The RNA profiles are archived in the SRA, and meta-information on each may be viewed through the SRA ID: <a href="https://www.ncbi.nlm.nih.gov/sra?term=SRX1756762">SRR3498212</a>, <a href="https://www.ncbi.nlm.nih.gov/sra/?term=SRR3498213">SRR3498213</a>, <a href="https://www.ncbi.nlm.nih.gov/sra?term=SRX1756765">SRR3498215</a>, <a href="https://www.ncbi.nlm.nih.gov/sra?term=SRX1756766">SRR3498216</a>.
+In this tutorial, we will be analyzing thale cress (Arabidopsis thaliana) RNA-Seq data from various parts of the plant (roots, stems). Perhaps one of the most common organisms for genetic study, the aggregrate wealth of genetic information of the thale cress makes it ideal for new-comers to learn. Organisms such as this we call "model organisms". You may think of model organisms as a subset of living things which, under the normal conventions of analysis, behave nicely. The data we will be analyzing comes from an experiment in which various cellular RNA was collected from the roots and shoots of a single thale cress. The RNA profiles are archived in the SRA, and metaInformation on each may be viewed through the SRA ID: <a href="https://www.ncbi.nlm.nih.gov/sra?term=SRX1756762">SRR3498212</a>, <a href="https://www.ncbi.nlm.nih.gov/sra/?term=SRR3498213">SRR3498213</a>, <a href="https://www.ncbi.nlm.nih.gov/sra?term=SRX1756765">SRR3498215</a>, <a href="https://www.ncbi.nlm.nih.gov/sra?term=SRX1756766">SRR3498216</a>.
 
 The Single Read Archive, or SRA, is a publicly available database containing read sequences from a variety of experiments. Scientists who would like their read sequences present on the SRA submit a report containing the read sequences, experimental details, and any other accessory meta-data.
 
@@ -58,7 +58,7 @@ Now that we have covered the introduction and objective of our analysis, we may 
 
 <h2 id="Second_Point_Header">Accessing the data using sra-toolkit </h2>
 
-We know that the SRA contain the read sequences and accessory meta-information from experiments. Rather than downloading experimental data through a browser, we may use the <a href="https://www.ncbi.nlm.nih.gov/books/NBK158900/">sratoolkit</a>'s "fastq-dump" function to directly dump raw read data into the current terminal directory. Let's have a look at this function (it is expected that you have read the Xanadu tutorial, and are familiar with loading modules):
+We know that the SRA contain the read sequences and accessory metaInformation from experiments. Rather than downloading experimental data through a browser, we may use the <a href="https://www.ncbi.nlm.nih.gov/books/NBK158900/">sratoolkit</a>'s "fastq-dump" function to directly dump raw read data into the current terminal directory. Let's have a look at this function (it is expected that you have read the Xanadu tutorial, and are familiar with loading modules):
 
 <pre style="color: silver; background: black;">-bash-4.2$ module load sratoolkit
   fastq-dump [options] <path> [<path>...]
@@ -585,7 +585,7 @@ Chr1	StringTie	exon	50075	50337	1000	-	.	gene_id "STRG.3"; transcript_id "STRG.3
 Chr1	StringTie	exon	50419	50631	1000	-	.	gene_id "STRG.3"; transcript_id "STRG.3.1"; exon_number "2"; reference_id "AT1G01100.2"; ref_gene_id "AT1G01100"; ref_gene_name "AT1G01100"; cov "9.487524";
 </pre>
 
-While this is certainly confusing, we can still understand it. To start each row we have the chromosome for each sequence. The second column is the software used to assemble the transcript, in our case StringTie. The third column is the sequence type, either a transcript or an exon. The next two columns are the start and end bp of the feature (assuming the chromosome starts at bp 1), followed by another column which is the score. The column after the score is either "+" or "-" for forward strand and reverse strand, respectively. Our last two columns are the frame ("." means frame not determined) and the feature meta-information. 
+While this is certainly confusing, we can still understand it. To start each row we have the chromosome for each sequence. The second column is the software used to assemble the transcript, in our case StringTie. The third column is the sequence type, either a transcript or an exon. The next two columns are the start and end bp of the feature (assuming the chromosome starts at bp 1), followed by another column which is the score. The column after the score is either "+" or "-" for forward strand and reverse strand, respectively. Our last two columns are the frame ("." means frame not determined) and the feature metaInformation. 
 
 You may be wondering about the last three columns which are not standard in GTF. The column "cov" is simply the covariance of the gene across samples (if the gene is highly or lowly expressed in both samples the covariance will be high, if it is highly expressed in one sample and lowly expressed in another sample, the covariance will be low). The FPKM column is the fragment per kilobase million value. Simply put, this is the number of times the specific feature was counted divided by how many counts there were for all features combined, in millions. That number is then divided by the length of the feature in kilobases. The reason for this being that longer features should have higher counts. For instance, when we split our mRNA in sequences of 50 or less for reading, one 5000 bp transcript will appear as 100 counts, and one 500 bp transcript will appear as 10 counts. Now, let's divide each count by the transcript length in kilobases: we have 20 as the value for the 5000 bp sequence (100/(5000/1000)) and 20 as the value for the 500 bp sequence (10/(500/1000)! Now our quantification matches the actual expression profile -- that is, both features were transcribed the same amount.
 
@@ -1361,7 +1361,7 @@ min(fpkm)
 max(fpkm)
 <strong>1179157</strong>
 </pre>
-Due to the scaling, we cannot truly see the distribution. However, what we <i>can</i> do is to transform the data such that the variance is not so staggering, allowing us to see better. There are a few rules for this, all of the data must be transformed in a consistent and reversible manner, after transformation no data may have a negative value, and all data with a value of 0 must also be 0 after transformation. The reason for the second and third rules is more epistemological. For us, if a gene has an FPKM of 0, then for that sample the gene is unexpressed. Should we transform the data and that particular gene's FPKM is now above 0, we are fundamentally changing the nature of that sample -- i.e., we are now saying it is expresesing a gene it actually is not! Additionally, there is no such thing as negative expression, so there is no physical reality where we will have an FPKM beneath 0. With these three rules, we see that taking the log of all our data will prevent negative values, be consistent and reversible, and scale down our variance. However, log(0) = -inf! We have broken a cardinal rule (oddly enough, the fact that it is infinity is not a rule-breaker, but rather that it is <b>negative</b> infinity! Seeing this, we can simply add 1 to our data before log transforming, log(0+1) = 0. Now we have fulfilled all three rules.
+Due to the scaling, we cannot truly see the distribution. However, what we <i>can</i> do is to transform the data such that the variance is not so staggering, allowing us to see better. There are a few rules for this, all of the data must be transformed in a consistent and reversible manner, after transformation no data may have a negative value, and all data with a value of 0 must also be 0 after transformation. The reason for the second and third rules is more epistemological. For us, if a gene has an FPKM of 0, then for that sample the gene is unexpressed. Should we transform the data and that particular gene's FPKM is now above 0, we are fundamentally changing the nature of that sample -- i.e., we are now saying it is expresesing a gene it actually is not! Additionally, there is no such thing as negative expression, so there is no physical reality where we will have an FPKM beneath 0. With these three rules, we see that taking the log of all our data will prevent negative values, be consistent and reversible, and scale down our variance. However, log(0) = Inf! We have broken a cardinal rule (oddly enough, the fact that it is infinity is not a rule-breaker, but rather that it is <b>negative</b> infinity! Seeing this, we can simply add 1 to our data before log transforming, log(0+1) = 0. Now we have fulfilled all three rules.
 
 <pre style="color: silver; background: black;">
 fpkm = log2(fpkm + 1)
@@ -1696,7 +1696,7 @@ write.csv(complete_edge_list,file = "complete_edge_list.csv",row.names=F)</pre>
 Let's now visualize this edge list in Cytoscape. The end result should look something like this:
 <img src="complete_edge_list.csv.png">
 
-While this is nice, we would like some computational proof of which groups have the highest connectivity and the degree of relationships among groups. We will term "connectivity" for this tutorial simply as the number of neighbors a group has. We will term "degree of relationship" as the number of neighbors through which one group must go before reaching the other group + 1. Looking at our Cytoscape output we see that for connected groups the greatest degree of relationships is 2. For groups in separate clusters we will call their degree of relationship as -Inf.
+While this is nice, we would like some computational proof of which groups have the highest connectivity and the degree of relationships among groups. We will term "connectivity" for this tutorial simply as the number of neighbors a group has. We will term "degree of relationship" as the number of neighbors through which one group must go before reaching the other group + 1. Looking at our Cytoscape output we see that for connected groups the greatest degree of relationships is 2. For groups in separate clusters we will call their degree of relationship as Inf.
 
 If you click on the export button in Cytoscape, we will have the option of exporting the network. Click on that and export the network as a .xml file. 
 
@@ -1892,7 +1892,7 @@ extended_sink_interaction = unique_interactions[unique_interactions$sink == sink
 if (length(intersect(extended_source_interaction[,2],extended_sink_interaction[,1]))>=1){
 degree_of_relation_matrix[i,j] = 2
 }
-else{degree_of_relation_matrix[i,j] = -Inf
+else{degree_of_relation_matrix[i,j] = Inf
 }
 }
 }
@@ -1902,27 +1902,27 @@ else{degree_of_relation_matrix[i,j] = -Inf
 degree_of_relation_matrix
 <strong>
       1    2    3    4    5    6    7    8    9   10   11   12   13   14   26   28   39   42   56   70   84
-1     0    2    2 -Inf -Inf    2    2 -Inf -Inf -Inf -Inf -Inf    1    1 -Inf -Inf -Inf -Inf    2 -Inf -Inf
-2     2    0    2 -Inf -Inf    2    2 -Inf -Inf -Inf -Inf -Inf    1    1 -Inf -Inf -Inf -Inf    2 -Inf -Inf
-3     2    2    0 -Inf -Inf    2    2 -Inf -Inf -Inf -Inf -Inf    1    1 -Inf -Inf -Inf -Inf    2 -Inf -Inf
-4  -Inf -Inf -Inf    0 -Inf -Inf -Inf    2    2    2    2    2 -Inf -Inf    1    1 -Inf -Inf -Inf    2    2
-5  -Inf -Inf -Inf -Inf    0 -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf    1    1 -Inf -Inf -Inf
-6     2    2    2 -Inf -Inf    0    2 -Inf -Inf -Inf -Inf -Inf    1    1 -Inf -Inf -Inf -Inf    2 -Inf -Inf
-7     2    2    2 -Inf -Inf    2    0 -Inf -Inf -Inf -Inf -Inf    1    2 -Inf -Inf -Inf -Inf    1 -Inf -Inf
-8  -Inf -Inf -Inf    2 -Inf -Inf -Inf    0    2    2    2    2 -Inf -Inf    1    2 -Inf -Inf -Inf    1    2
-9  -Inf -Inf -Inf    2 -Inf -Inf -Inf    2    0    2    2    2 -Inf -Inf    1    1 -Inf -Inf -Inf    2    2
-10 -Inf -Inf -Inf    2 -Inf -Inf -Inf    2    2    0    2    2 -Inf -Inf    1    1 -Inf -Inf -Inf    2    2
-11 -Inf -Inf -Inf    2 -Inf -Inf -Inf    2    2    2    0    2 -Inf -Inf    1    2 -Inf -Inf -Inf    2    1
-12 -Inf -Inf -Inf    2 -Inf -Inf -Inf    2    2    2    2    0 -Inf -Inf    1    1 -Inf -Inf -Inf    2    2
-13    1    1    1 -Inf -Inf    1    1 -Inf -Inf -Inf -Inf -Inf    0    1 -Inf -Inf -Inf -Inf    1 -Inf -Inf
-14    1    1    1 -Inf -Inf    1    2 -Inf -Inf -Inf -Inf -Inf    1    0 -Inf -Inf -Inf -Inf    2 -Inf -Inf
-26 -Inf -Inf -Inf    1 -Inf -Inf -Inf    1    1    1    1    1 -Inf -Inf    0    1 -Inf -Inf -Inf    1    1
-28 -Inf -Inf -Inf    1 -Inf -Inf -Inf    2    1    1    2    1 -Inf -Inf    1    0 -Inf -Inf -Inf    2    2
-39 -Inf -Inf -Inf -Inf    1 -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf    0    1 -Inf -Inf -Inf
-42 -Inf -Inf -Inf -Inf    1 -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf    1    0 -Inf -Inf -Inf
-56    2    2    2 -Inf -Inf    2    1 -Inf -Inf -Inf -Inf -Inf    1    2 -Inf -Inf -Inf -Inf    0 -Inf -Inf
-70 -Inf -Inf -Inf    2 -Inf -Inf -Inf    1    2    2    2    2 -Inf -Inf    1    2 -Inf -Inf -Inf    0    2
-84 -Inf -Inf -Inf    2 -Inf -Inf -Inf    2    2    2    1    2 -Inf -Inf    1    2 -Inf -Inf -Inf    2    0</strong>
+1     0    2    2 Inf Inf    2    2 Inf Inf Inf Inf Inf    1    1 Inf Inf Inf Inf    2 Inf Inf
+2     2    0    2 Inf Inf    2    2 Inf Inf Inf Inf Inf    1    1 Inf Inf Inf Inf    2 Inf Inf
+3     2    2    0 Inf Inf    2    2 Inf Inf Inf Inf Inf    1    1 Inf Inf Inf Inf    2 Inf Inf
+4  Inf Inf Inf    0 Inf Inf Inf    2    2    2    2    2 Inf Inf    1    1 Inf Inf Inf    2    2
+5  Inf Inf Inf Inf    0 Inf Inf Inf Inf Inf Inf Inf Inf Inf Inf Inf    1    1 Inf Inf Inf
+6     2    2    2 Inf Inf    0    2 Inf Inf Inf Inf Inf    1    1 Inf Inf Inf Inf    2 Inf Inf
+7     2    2    2 Inf Inf    2    0 Inf Inf Inf Inf Inf    1    2 Inf Inf Inf Inf    1 Inf Inf
+8  Inf Inf Inf    2 Inf Inf Inf    0    2    2    2    2 Inf Inf    1    2 Inf Inf Inf    1    2
+9  Inf Inf Inf    2 Inf Inf Inf    2    0    2    2    2 Inf Inf    1    1 Inf Inf Inf    2    2
+10 Inf Inf Inf    2 Inf Inf Inf    2    2    0    2    2 Inf Inf    1    1 Inf Inf Inf    2    2
+11 Inf Inf Inf    2 Inf Inf Inf    2    2    2    0    2 Inf Inf    1    2 Inf Inf Inf    2    1
+12 Inf Inf Inf    2 Inf Inf Inf    2    2    2    2    0 Inf Inf    1    1 Inf Inf Inf    2    2
+13    1    1    1 Inf Inf    1    1 Inf Inf Inf Inf Inf    0    1 Inf Inf Inf Inf    1 Inf Inf
+14    1    1    1 Inf Inf    1    2 Inf Inf Inf Inf Inf    1    0 Inf Inf Inf Inf    2 Inf Inf
+26 Inf Inf Inf    1 Inf Inf Inf    1    1    1    1    1 Inf Inf    0    1 Inf Inf Inf    1    1
+28 Inf Inf Inf    1 Inf Inf Inf    2    1    1    2    1 Inf Inf    1    0 Inf Inf Inf    2    2
+39 Inf Inf Inf Inf    1 Inf Inf Inf Inf Inf Inf Inf Inf Inf Inf Inf    0    1 Inf Inf Inf
+42 Inf Inf Inf Inf    1 Inf Inf Inf Inf Inf Inf Inf Inf Inf Inf Inf    1    0 Inf Inf Inf
+56    2    2    2 Inf Inf    2    1 Inf Inf Inf Inf Inf    1    2 Inf Inf Inf Inf    0 Inf Inf
+70 Inf Inf Inf    2 Inf Inf Inf    1    2    2    2    2 Inf Inf    1    2 Inf Inf Inf    0    2
+84 Inf Inf Inf    2 Inf Inf Inf    2    2    2    1    2 Inf Inf    1    2 Inf Inf Inf    2    0</strong>
 
 write.csv(file="degree_of_relation_matrix.csv",degree_of_relation_matrix,row.names=T)</pre>
 
