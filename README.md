@@ -1014,7 +1014,7 @@ plot(density(fpkm[,1]),main="Density Comparison")
 lines(density(fpkm[,2])
 lines(density(fpkm[,3])
 lines(density(fpkm[,4])</pre>
-<iframe src="https://giphy.com/embed/vguRtoLNbox0zbC768" width="480" height="474" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/vguRtoLNbox0zbC768">via GIPHY</a></p>
+<img src="https://giphy.com/embed/vguRtoLNbox0zbC768" width="480" height="474" frameBorder="0" class="giphy-embed" allowFullScreen></img><p><a href="https://giphy.com/gifs/vguRtoLNbox0zbC768">via GIPHY</a></p>
 
 We see that overall the distributions are pretty similar, but not identical -- shoot 2 has the highest expression levels while root 2 has the lowest.
 
