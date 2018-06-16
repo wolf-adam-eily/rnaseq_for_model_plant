@@ -624,7 +624,7 @@ merged.tracking</pre>
 
 Although you have not run the code yet, let's have a look at some of the files we've generated (we will not be looking at the merged.annotated.gtf as we are already quite familiar with the gtf format!)
 
-<pre style="color: silver; background: black;">bash-4.2$ -bash-4.2$ head merged.loci
+<pre style="color: silver; background: black;">-bash-4.2$ head merged.loci
 XLOC_000001	Chr1[+]3631-5899	AT1G01010|AT1G01010.1	AT1G01010.1
 XLOC_000002	Chr1[+]23146-31227	AT1G01040|AT1G01040.1,AT1G01040|AT1G01040.2	AT1G01040.1,AT1G01040.2
 XLOC_000003	Chr1[+]28500-28706	AT1G01046|AT1G01046.1	AT1G01046.1
