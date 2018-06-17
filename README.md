@@ -1702,7 +1702,7 @@ If you click on the export button in Cytoscape, we will have the option of expor
 
 Now, <a href="https://support.office.com/en-us/article/import-xml-data-6eca3906-d6c9-4f0d-b911-c736da817fa4#bmopen_an_xml_data_file">open the .xml file in Microsoft Excel</a>, and you should see something like this:
 
-While we will not go into great detail here, we are interesetd in the ns1:data4 column. Copy and paste that column into a new Excel workbook and save it under the name "interaction_list.csv". Now let's load this file into R:
+While we will not go into great detail here, we are interested in the ns1:data4 column. Copy and paste that column into a new Excel workbook and save it under the name "interaction_list.csv". Now let's load this file into R:
 
 <pre style="color: silver; background: black;">interaction_list = read.csv("interaction_list.csv",header=F)
 head(interaction_list)
